@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.2.2 专业控制台</title>
+  <title>GMGN AI Trader V1.2.3 推送诊断版</title>
   <style>
     body {
       margin: 0;
@@ -61,6 +61,7 @@
       border: 1px solid #26344d;
       border-radius: 18px;
       padding: 14px;
+      margin-bottom: 14px;
     }
 
     .panel h2 {
@@ -75,17 +76,17 @@
       word-break: break-word;
     }
 
-    .ok {
+    .ok, .green {
       color: #81f0a4;
       font-weight: bold;
     }
 
-    .bad {
+    .bad, .red {
       color: #ff8b8b;
       font-weight: bold;
     }
 
-    .mid {
+    .mid, .yellow {
       color: #ffd38a;
       font-weight: bold;
     }
@@ -262,31 +263,91 @@
       overflow: auto;
     }
 
+    .diag-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .diag-card {
+      background: #0b1220;
+      border: 1px solid #26344d;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .diag-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .diag-ok {
+      border-color: rgba(129, 240, 164, 0.55);
+    }
+
+    .diag-bad {
+      border-color: rgba(255, 139, 139, 0.45);
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      margin: 4px 4px 4px 0;
+      background: #172033;
+      color: #dce8ff;
+      border: 1px solid #2b3a52;
+    }
+
+    .tag-ok {
+      background: rgba(129, 240, 164, 0.12);
+      color: #81f0a4;
+      border-color: rgba(129, 240, 164, 0.4);
+    }
+
+    .tag-bad {
+      background: rgba(255, 139, 139, 0.12);
+      color: #ff8b8b;
+      border-color: rgba(255, 139, 139, 0.4);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .summary-item {
+      background: #0b1220;
+      border: 1px solid #26344d;
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .summary-num {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
     .footer {
       margin-top: 20px;
       color: #8190a8;
       font-size: 13px;
       line-height: 1.6;
     }
-
-    .green {
-      color: #81f0a4;
-    }
-
-    .red {
-      color: #ff8b8b;
-    }
-
-    .yellow {
-      color: #ffd38a;
-    }
   </style>
 </head>
+
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.2.2 专业控制台</h1>
-      <p>真实热门币风险扫描 + Telegram 精准提醒控制台。当前版本只提醒，不连接钱包，不自动买入。</p>
+      <h1>GMGN AI Trader V1.2.3 推送诊断控制台</h1>
+      <p>真实热门币风险扫描 + Telegram 精准提醒 + 未推送原因诊断。当前版本只提醒，不连接钱包，不自动买入。</p>
       <div class="warning">
         风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。
       </div>
@@ -311,6 +372,7 @@
 
     <div class="panel">
       <h2>控制台操作</h2>
+
       <div class="toolbar">
         <select id="chain">
           <option value="bsc">BSC</option>
@@ -336,15 +398,21 @@
       </div>
     </div>
 
-    <div class="panel" style="margin-top: 14px;">
+    <div class="panel">
+      <h2>推送诊断</h2>
+      <div id="diagnosticSummary" class="status-line">点击“手动推送提醒”或“强制测试推送”后显示诊断。</div>
+      <div id="diagnosticList" class="diag-list"></div>
+    </div>
+
+    <div class="panel">
       <h2>操作结果</h2>
       <div id="consoleLog" class="logbox">暂无操作结果。</div>
     </div>
 
-    <div id="cards" class="cards" style="margin-top: 14px;"></div>
+    <div id="cards" class="cards"></div>
 
     <div class="footer">
-      当前版本：V1.2.2 前端专业控制台版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
+      当前版本：V1.2.3 推送诊断显示版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
     </div>
   </div>
 
@@ -391,7 +459,8 @@
         config = data;
 
         document.getElementById("backendStatus").innerHTML = `
-          版本：<span class="ok">${data.version || "-"}</span><br/>
+          后端版本：<span class="ok">${data.version || "-"}</span><br/>
+          前端版本：<span class="ok">V1.2.3</span><br/>
           自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize || 0} 个
@@ -505,6 +574,73 @@
       }).join("");
     }
 
+    function renderDiagnostics(result) {
+      const summary = document.getElementById("diagnosticSummary");
+      const listBox = document.getElementById("diagnosticList");
+
+      const diagnostics = result.diagnostics || [];
+      const passed = diagnostics.filter(x => x.canSend).length;
+      const failed = diagnostics.length - passed;
+
+      summary.innerHTML = `
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-num green">${result.total || 0}</div>
+            <div class="status-line">扫描总数</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num green">${result.alertCandidates || 0}</div>
+            <div class="status-line">符合候选</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num yellow">${result.selectedForSend || 0}</div>
+            <div class="status-line">选中推送</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num green">${result.sentCount || 0}</div>
+            <div class="status-line">已推送</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num green">${passed}</div>
+            <div class="status-line">通过规则</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num red">${failed}</div>
+            <div class="status-line">未通过规则</div>
+          </div>
+        </div>
+      `;
+
+      if (!diagnostics.length) {
+        listBox.innerHTML = `<div class="status">暂无诊断数据。</div>`;
+        return;
+      }
+
+      listBox.innerHTML = diagnostics.map(d => {
+        const failedReasons = d.failed || [];
+        const ok = d.canSend;
+
+        return `
+          <div class="diag-card ${ok ? "diag-ok" : "diag-bad"}">
+            <div class="diag-title">${d.symbol || "UNKNOWN"}</div>
+
+            <div>
+              ${ok ? '<span class="tag tag-ok">符合推送</span>' : '<span class="tag tag-bad">未推送</span>'}
+              <span class="tag">评分 ${d.score}</span>
+              <span class="tag">流动性 ${money(d.liquidity)}</span>
+              <span class="tag">24H量 ${money(d.volume24h)}</span>
+              <span class="tag">1H ${Number(d.change1h || 0).toFixed(2)}%</span>
+              <span class="tag">时间 ${Number(d.ageMinutes || 0)} 分钟</span>
+            </div>
+
+            <div class="reason">
+              ${ok ? "原因：已符合当前精准提醒规则。" : "未推送原因：" + failedReasons.join("、")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     async function scan() {
       const chain = document.getElementById("chain").value;
       const status = document.getElementById("status");
@@ -524,7 +660,7 @@
 
         allTokens = data.tokens || [];
 
-        status.innerText = `扫描完成｜版本：${data.version || "V1.2.2"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
+        status.innerText = `扫描完成｜版本：${data.version || "V1.2.3"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
 
         log("扫描完成", {
           version: data.version,
@@ -580,7 +716,10 @@
         }
 
         const result = data.result || {};
+
         status.innerText = `提醒扫描完成｜候选：${result.alertCandidates || 0}｜选中：${result.selectedForSend || 0}｜已推送：${result.sentCount || 0}`;
+
+        renderDiagnostics(result);
 
         log(force ? "强制测试推送结果" : "精准提醒扫描结果", {
           chain: data.chain,
@@ -591,8 +730,7 @@
           sentCount: result.sentCount,
           sent: result.sent,
           failedSend: result.failedSend,
-          rules: result.rules,
-          diagnosticsPreview: (result.diagnostics || []).slice(0, 5)
+          rules: result.rules
         });
 
         loadConfig();
