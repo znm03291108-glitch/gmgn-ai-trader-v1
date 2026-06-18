@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.2.5 黑白名单过滤控制台
+  <title>GMGN AI Trader V1.2.5 黑白名单过滤控制台</title>
   <style>
     body {
       margin: 0;
@@ -314,6 +314,18 @@
       border-color: rgba(255, 139, 139, 0.4);
     }
 
+    .tag-white {
+      background: rgba(255, 215, 0, 0.12);
+      color: #ffd700;
+      border-color: rgba(255, 215, 0, 0.45);
+    }
+
+    .tag-black {
+      background: rgba(255, 80, 80, 0.13);
+      color: #ff8080;
+      border-color: rgba(255, 80, 80, 0.45);
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -346,8 +358,8 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.2.5 黑名单过滤控制台</h1>
-      <p>真实热门币风险扫描 + Telegram 精准提醒 + 未推送原因诊断。当前版本只提醒，不连接钱包，不自动买入。</p>
+      <h1>GMGN AI Trader V1.2.5 黑白名单过滤控制台</h1>
+      <p>真实热门币风险扫描 + Telegram 精准提醒 + 黑名单 / 白名单过滤。当前版本只提醒，不连接钱包，不自动买入。</p>
       <div class="warning">
         风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。
       </div>
@@ -368,6 +380,11 @@
         <h2>提醒规则</h2>
         <div id="rulesBox" class="status-line">正在读取提醒规则...</div>
       </div>
+    </div>
+
+    <div class="panel">
+      <h2>黑白名单状态</h2>
+      <div id="listStatusBox" class="status-line">正在读取黑白名单...</div>
     </div>
 
     <div class="panel">
@@ -395,6 +412,8 @@
         <div class="chip" onclick="setFilter('safe', this)">只看低风险</div>
         <div class="chip" onclick="setFilter('watch', this)">观察区</div>
         <div class="chip" onclick="setFilter('danger', this)">高风险</div>
+        <div class="chip" onclick="setFilter('white', this)">白名单</div>
+        <div class="chip" onclick="setFilter('black', this)">黑名单</div>
       </div>
     </div>
 
@@ -412,7 +431,7 @@
     <div id="cards" class="cards"></div>
 
     <div class="footer">
-      当前版本：V1.2.5 黑名单 / 白名单过滤版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
+      当前版本：V1.2.5 黑名单 / 白名单过滤版。后续可升级：网页添加黑名单、会员系统、GMGN 真实安全检测、钱包追踪、自动止盈止损。
     </div>
   </div>
 
@@ -481,10 +500,17 @@
           每次最多推送：<span class="ok">${r.maxAlertsPerRun}</span><br/>
           重复提醒冷却：<span class="ok">${r.cooldownHours} 小时</span>
         `;
+
+        document.getElementById("listStatusBox").innerHTML = `
+          黑名单符号：<span class="bad">${(data.blacklistSymbols || []).length ? data.blacklistSymbols.join(", ") : "未设置"}</span><br/>
+          黑名单地址数量：<span class="bad">${data.blacklistAddressesCount || 0}</span><br/>
+          白名单地址数量：<span class="ok">${data.whitelistAddressesCount || 0}</span>
+        `;
       } catch (err) {
         document.getElementById("backendStatus").innerHTML = `<span class="bad">后端状态读取失败</span>`;
         document.getElementById("telegramStatus").innerHTML = `<span class="bad">Telegram 状态读取失败</span>`;
         document.getElementById("rulesBox").innerHTML = `<span class="bad">规则读取失败</span>`;
+        document.getElementById("listStatusBox").innerHTML = `<span class="bad">黑白名单读取失败</span>`;
       }
     }
 
@@ -504,6 +530,12 @@
       }
       if (currentFilter === "danger") {
         return allTokens.filter(t => t.risk && t.risk.score < 50);
+      }
+      if (currentFilter === "white") {
+        return allTokens.filter(t => t.isWhitelisted);
+      }
+      if (currentFilter === "black") {
+        return allTokens.filter(t => t.isBlacklisted);
       }
       return allTokens;
     }
@@ -531,6 +563,9 @@
         const score = Number(risk.score || 0);
         const scoreClass = score >= 75 ? "green" : score < 50 ? "red" : "yellow";
 
+        const whiteTag = token.isWhitelisted ? `<span class="tag tag-white">⭐ 白名单</span>` : "";
+        const blackTag = token.isBlacklisted ? `<span class="tag tag-black">⛔ 黑名单</span>` : "";
+
         return `
           <div class="card">
             <div class="top">
@@ -540,6 +575,8 @@
               </div>
               <div class="level">${risk.level || "未知"}</div>
             </div>
+
+            <div style="margin-top:8px;">${whiteTag}${blackTag}</div>
 
             <div class="score ${scoreClass}">${score}</div>
             <div class="meta">风险评分 / 100</div>
@@ -581,6 +618,8 @@
       const diagnostics = result.diagnostics || [];
       const passed = diagnostics.filter(x => x.canSend).length;
       const failed = diagnostics.length - passed;
+      const blacklisted = diagnostics.filter(x => x.isBlacklisted).length;
+      const whitelisted = diagnostics.filter(x => x.isWhitelisted).length;
 
       summary.innerHTML = `
         <div class="summary-grid">
@@ -608,6 +647,14 @@
             <div class="summary-num red">${failed}</div>
             <div class="status-line">未通过规则</div>
           </div>
+          <div class="summary-item">
+            <div class="summary-num red">${blacklisted}</div>
+            <div class="status-line">黑名单命中</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-num green">${whitelisted}</div>
+            <div class="status-line">白名单命中</div>
+          </div>
         </div>
       `;
 
@@ -626,6 +673,8 @@
 
             <div>
               ${ok ? '<span class="tag tag-ok">符合推送</span>' : '<span class="tag tag-bad">未推送</span>'}
+              ${d.isWhitelisted ? '<span class="tag tag-white">⭐ 白名单</span>' : ''}
+              ${d.isBlacklisted ? '<span class="tag tag-black">⛔ 黑名单</span>' : ''}
               <span class="tag">评分 ${d.score}</span>
               <span class="tag">流动性 ${money(d.liquidity)}</span>
               <span class="tag">24H量 ${money(d.volume24h)}</span>
@@ -660,7 +709,7 @@
 
         allTokens = data.tokens || [];
 
-        status.innerText = `扫描完成｜版本：${data.version || "V1.2.3"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
+        status.innerText = `扫描完成｜版本：${data.version || "V1.2.5"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
 
         log("扫描完成", {
           version: data.version,
