@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GMGN AI Trader V1 风险扫描版</title>
+  <style>
+    body {
+      margin: 0;
+      background: #080b12;
+      color: #f4f7fb;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+    .page {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #101827, #172033);
+      border: 1px solid #243044;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+    .hero p {
+      color: #aebbd0;
+      line-height: 1.6;
+    }
+    .warning {
+      background: rgba(255, 173, 51, 0.12);
+      border: 1px solid rgba(255, 173, 51, 0.4);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 12px 0;
+      color: #ffd38a;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    select, button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    select {
+      background: #111827;
+      color: #fff;
+      border: 1px solid #2b3a52;
+    }
+    button {
+      background: #2f7cff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: #111827;
+      border: 1px solid #26344d;
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .symbol {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .level {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      background: #222f45;
+    }
+    .score {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 14px 0 4px;
+    }
+    .meta {
+      color: #aebbd0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .reason {
+      background: #0b1220;
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 10px;
+      color: #d9e2f1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .advice {
+      margin-top: 12px;
+      font-weight: bold;
+      color: #8fd3ff;
+    }
+    .footer {
+      margin-top: 20px;
+      color: #8190a8;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .danger {
+      color: #ff8b8b;
+    }
+    .good {
+      color: #81f0a4;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <h1>GMGN AI Trader V1 风险扫描版</h1>
+      <p>自动扫描热门 Meme 币，计算风险评分，给出观察 / 试单 / 禁止买入建议。V1 不自动买入，不连接钱包。</p>
+      <div class="warning">
+        风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="chain">
+        <option value="bsc">BSC</option>
+        <option value="sol">Solana</option>
+        <option value="eth">Ethereum</option>
+        <option value="base">Base</option>
+      </select>
+      <button onclick="scan()">开始扫描</button>
+    </div>
+
+    <div id="status" class="meta">等待扫描...</div>
+    <div id="cards" class="cards"></div>
+
+    <div class="footer">
+      当前版本：V1 风险扫描版。后续可升级：真实 GMGN API 数据、Telegram 提醒、钱包追踪、自动止盈止损、小额自动交易。
+    </div>
+  </div>
+
+  <script>
+    // 这里填你的 Railway 后端地址
+    const API_BASE = "你的Railway后端地址";
+
+    async function scan() {
+      const chain = document.getElementById("chain").value;
+      const status = document.getElementById("status");
+      const cards = document.getElementById("cards");
+
+      status.innerText = "正在扫描 " + chain + " 热门代币...";
+      cards.innerHTML = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/scan?chain=${chain}`);
+        const data = await res.json();
+
+        if (!data.ok) {
+          status.innerText = "扫描失败：" + (data.message || "未知错误");
+          return;
+        }
+
+        status.innerText = `扫描完成｜数据源：${data.source}｜更新时间：${data.updateTime}`;
+
+        cards.innerHTML = data.tokens.map(token => {
+          const risk = token.risk;
+          const scoreClass = risk.score >= 75 ? "good" : risk.score < 50 ? "danger" : "";
+
+          return `
+            <div class="card">
+              <div class="top">
+                <div>
+                  <div class="symbol">${token.symbol}</div>
+                  <div class="meta">${token.name}</div>
+                </div>
+                <div class="level">${risk.level}</div>
+              </div>
+
+              <div class="score ${scoreClass}">${risk.score}</div>
+              <div class="meta">风险评分 / 100</div>
+
+              <div class="meta">
+                链：${token.chain}<br/>
+                价格：${token.price}<br/>
+                流动性：$${token.liquidity}<br/>
+                24H交易量：$${token.volume24h}<br/>
+                前10持仓：${token.top10HolderRate}%<br/>
+                1小时涨幅：${token.priceChange1h}%<br/>
+                买税/卖税：${token.buyTax}% / ${token.sellTax}%<br/>
+                新盘时间：${token.ageMinutes} 分钟
+              </div>
+
+              <div class="reason">
+                风险原因：${risk.reasons.length ? risk.reasons.join("、") : "暂未发现明显高危项"}
+              </div>
+
+              <div class="advice">
+                AI建议：${risk.advice}
+              </div>
+            </div>
+          `;
+        }).join("");
+
+      } catch (err) {
+        status.innerText = "请求失败，请检查 Railway 后端地址是否正确。";
+      }
+    }
+  </script>
+</body>
+</html>
