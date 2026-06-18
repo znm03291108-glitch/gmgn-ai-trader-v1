@@ -13,7 +13,18 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || "";
 const AUTO_ALERT = String(process.env.AUTO_ALERT || "false").toLowerCase() === "true";
 const SCAN_INTERVAL_SECONDS = Number(process.env.SCAN_INTERVAL_SECONDS || 60);
 
-// V1.2.1 精准提醒规则
+/**
+ * GMGN AI Trader V1.2.4
+ * 强制推送区分版
+ *
+ * 说明：
+ * 1. 正常推送：严格按照提醒规则筛选。
+ * 2. 强制推送：只用于测试 Telegram，绕过规则，只推送 1 个币。
+ * 3. 不连接钱包，不自动买入。
+ * 4. 数据源：DexScreener fallback。
+ */
+
+// 精准提醒规则
 const ALERT_RULES = {
   minScore: Number(process.env.MIN_SCORE || 90),
   minLiquidity: Number(process.env.MIN_LIQUIDITY || 300000),
@@ -26,6 +37,7 @@ const ALERT_RULES = {
   cooldownHours: Number(process.env.ALERT_COOLDOWN_HOURS || 24)
 };
 
+// 内存缓存：防止同一个币短时间重复提醒
 const sentAlertMap = new Map();
 
 function toNumber(v, fallback = 0) {
@@ -48,6 +60,15 @@ function cleanupSentMap() {
       sentAlertMap.delete(key);
     }
   }
+}
+
+function money(v) {
+  const n = Number(v || 0);
+  if (!n) return "$0";
+  if (n >= 1000000000) return "$" + (n / 1000000000).toFixed(2) + "B";
+  if (n >= 1000000) return "$" + (n / 1000000).toFixed(2) + "M";
+  if (n >= 1000) return "$" + (n / 1000).toFixed(2) + "K";
+  return "$" + n.toFixed(2);
 }
 
 function calcRiskScore(token) {
@@ -187,7 +208,7 @@ async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
       signal: controller.signal,
       headers: {
         accept: "application/json",
-        "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.2.1"
+        "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.2.4"
       }
     });
 
@@ -261,16 +282,7 @@ async function fetchDexData(chain) {
     .map((p) => normalizeDexToken(p, chain));
 }
 
-function money(v) {
-  const n = Number(v || 0);
-  if (!n) return "$0";
-  if (n >= 1000000000) return "$" + (n / 1000000000).toFixed(2) + "B";
-  if (n >= 1000000) return "$" + (n / 1000000).toFixed(2) + "M";
-  if (n >= 1000) return "$" + (n / 1000).toFixed(2) + "K";
-  return "$" + n.toFixed(2);
-}
-
-function getAlertDecision(token, force = false) {
+function getAlertDecision(token) {
   const risk = token.risk || {};
   const score = Number(risk.score || 0);
   const liquidity = Number(token.liquidity || 0);
@@ -293,12 +305,12 @@ function getAlertDecision(token, force = false) {
   if (change1h < ALERT_RULES.minChange1h) failed.push(`1小时涨幅低于 ${ALERT_RULES.minChange1h}%`);
   if (change1h > ALERT_RULES.maxChange1h) failed.push(`1小时涨幅高于 ${ALERT_RULES.maxChange1h}%`);
 
-  if (!force && lastSentAt && Date.now() - lastSentAt < cooldownMs) {
+  if (lastSentAt && Date.now() - lastSentAt < cooldownMs) {
     failed.push(`${ALERT_RULES.cooldownHours}小时内已提醒过`);
   }
 
   return {
-    ok: force ? failed.filter(x => x.includes("无合约地址")).length === 0 : failed.length === 0,
+    ok: failed.length === 0,
     key,
     failed
   };
@@ -308,32 +320,34 @@ function buildTelegramMessage(token, force = false) {
   const risk = token.risk || {};
 
   return [
-    force ? `🧪 GMGN AI Trader V1.2.1 强制测试提醒` : `🚨 GMGN AI Trader V1.2.1 精准候选币提醒`,
-    ``,
+    force ? "🧪 GMGN AI Trader V1.2.4 强制测试提醒" : "🚨 GMGN AI Trader V1.2.4 精准候选币提醒",
+    "",
+    force ? "模式：强制测试模式，已绕过过滤规则，不代表真实符合条件。" : "模式：正常精准过滤模式，已通过提醒规则。",
+    "",
     `币种：${token.symbol || "UNKNOWN"}`,
     `名称：${token.name || "-"}`,
     `链：${token.chain}`,
     `风险评分：${risk.score}/100`,
     `风险等级：${risk.level}`,
-    ``,
+    "",
     `价格：${token.price}`,
     `流动性：${money(token.liquidity)}`,
     `24H交易量：${money(token.volume24h)}`,
     `1小时涨幅：${Number(token.priceChange1h || 0).toFixed(2)}%`,
     `新盘时间：${Number(token.ageMinutes || 0)} 分钟`,
-    ``,
+    "",
     `AI建议：${risk.advice || "仅供观察"}`,
     `风险原因：${risk.reasons && risk.reasons.length ? risk.reasons.join("、") : "暂未发现明显高危项"}`,
-    ``,
-    `合约地址：`,
+    "",
+    "合约地址：",
     `${token.address}`,
-    ``,
+    "",
     token.gmgnUrl ? `GMGN：${token.gmgnUrl}` : "",
     token.dexUrl ? `Dex：${token.dexUrl}` : "",
-    ``,
+    "",
     `提醒规则：评分>=${ALERT_RULES.minScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，1H涨幅 ${ALERT_RULES.minChange1h}%~${ALERT_RULES.maxChange1h}%`,
-    ``,
-    `提醒：这不是投资建议，不要重仓跟买。`
+    "",
+    "提醒：这不是投资建议，不要重仓跟买。"
   ].filter(Boolean).join("\n");
 }
 
@@ -409,10 +423,10 @@ async function scanAndAlert(chain = "bsc", force = false) {
   const tokens = result.tokens || [];
 
   const diagnostics = [];
-  const candidates = [];
+  const realCandidates = [];
 
   for (const token of tokens) {
-    const decision = getAlertDecision(token, force);
+    const decision = getAlertDecision(token);
 
     diagnostics.push({
       symbol: token.symbol,
@@ -427,20 +441,39 @@ async function scanAndAlert(chain = "bsc", force = false) {
     });
 
     if (decision.ok) {
-      candidates.push({
+      realCandidates.push({
         token,
         decision
       });
     }
   }
 
-  const selected = candidates
-    .sort((a, b) => {
-      const av = Number(a.token.volume24h || 0);
-      const bv = Number(b.token.volume24h || 0);
-      return bv - av;
-    })
-    .slice(0, force ? 1 : ALERT_RULES.maxAlertsPerRun);
+  let selected = [];
+
+  if (force) {
+    const firstToken = tokens.find((t) => t.address);
+
+    if (firstToken) {
+      selected = [
+        {
+          token: firstToken,
+          decision: {
+            key: `${firstToken.chain}:${firstToken.address}`,
+            failed: ["强制测试模式：已绕过过滤规则"]
+          },
+          forceTest: true
+        }
+      ];
+    }
+  } else {
+    selected = realCandidates
+      .sort((a, b) => {
+        const av = Number(a.token.volume24h || 0);
+        const bv = Number(b.token.volume24h || 0);
+        return bv - av;
+      })
+      .slice(0, ALERT_RULES.maxAlertsPerRun);
+  }
 
   const sent = [];
   const failedSend = [];
@@ -451,10 +484,14 @@ async function scanAndAlert(chain = "bsc", force = false) {
     const tg = await sendTelegram(msg);
 
     if (tg.ok) {
-      sentAlertMap.set(item.decision.key, Date.now());
+      if (!force) {
+        sentAlertMap.set(item.decision.key, Date.now());
+      }
+
       sent.push({
         symbol: token.symbol,
-        address: token.address
+        address: token.address,
+        mode: force ? "force-test" : "normal-alert"
       });
     } else {
       failedSend.push({
@@ -470,7 +507,11 @@ async function scanAndAlert(chain = "bsc", force = false) {
     total: tokens.length,
     rules: ALERT_RULES,
     force,
-    alertCandidates: candidates.length,
+    mode: force ? "force-test" : "normal-alert",
+    note: force
+      ? "强制测试模式：只用于测试 Telegram，已绕过过滤规则，不代表真实符合条件。"
+      : "正常精准过滤模式：只推送真实符合规则的币。",
+    alertCandidates: realCandidates.length,
     selectedForSend: selected.length,
     sentCount: sent.length,
     sent,
@@ -481,9 +522,9 @@ async function scanAndAlert(chain = "bsc", force = false) {
 
 app.get("/", (req, res) => {
   res.json({
-    name: "GMGN AI Trader V1.2.1",
+    name: "GMGN AI Trader V1.2.4",
     status: "运行中",
-    mode: "精准提醒过滤版",
+    mode: "强制推送区分版",
     trading: false,
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     autoAlert: AUTO_ALERT,
@@ -495,7 +536,7 @@ app.get("/", (req, res) => {
 app.get("/api/config", (req, res) => {
   res.json({
     ok: true,
-    version: "V1.2.1",
+    version: "V1.2.4",
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     autoAlert: AUTO_ALERT,
     scanIntervalSeconds: SCAN_INTERVAL_SECONDS,
@@ -507,7 +548,7 @@ app.get("/api/config", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    version: "V1.2.1",
+    version: "V1.2.4",
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     time: new Date().toISOString()
   });
@@ -515,9 +556,9 @@ app.get("/api/health", (req, res) => {
 
 app.get("/api/telegram/test", async (req, res) => {
   const text = [
-    "✅ GMGN AI Trader V1.2.1 Telegram 测试成功",
+    "✅ GMGN AI Trader V1.2.4 Telegram 测试成功",
     "",
-    "精准提醒过滤版已上线。",
+    "强制推送区分版已上线。",
     "",
     `规则：评分>=${ALERT_RULES.minScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，每次最多${ALERT_RULES.maxAlertsPerRun}个。`,
     "",
@@ -528,7 +569,7 @@ app.get("/api/telegram/test", async (req, res) => {
 
   res.json({
     ok: result.ok,
-    version: "V1.2.1",
+    version: "V1.2.4",
     result
   });
 });
@@ -542,13 +583,14 @@ app.get("/api/scan", async (req, res) => {
     const result = await scanTokens(chain);
 
     let alertResult = null;
+
     if (notify) {
       alertResult = await scanAndAlert(chain, force);
     }
 
     res.json({
       ok: true,
-      version: "V1.2.1",
+      version: "V1.2.4",
       source: result.source,
       chain,
       tradingEnabled: false,
@@ -567,7 +609,7 @@ app.get("/api/scan", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.2.1",
+      version: "V1.2.4",
       source: "demo-after-error",
       chain,
       tradingEnabled: false,
@@ -588,7 +630,7 @@ app.get("/api/alert/run", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.2.1",
+      version: "V1.2.4",
       chain,
       result,
       time: new Date().toISOString()
@@ -596,14 +638,14 @@ app.get("/api/alert/run", async (req, res) => {
   } catch (err) {
     res.json({
       ok: false,
-      version: "V1.2.1",
+      version: "V1.2.4",
       error: err.message
     });
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("GMGN AI Trader V1.2.1 running on port " + PORT);
+  console.log("GMGN AI Trader V1.2.4 running on port " + PORT);
 
   if (AUTO_ALERT) {
     const intervalMs = Math.max(60, SCAN_INTERVAL_SECONDS) * 1000;
@@ -613,10 +655,13 @@ app.listen(PORT, "0.0.0.0", () => {
     setInterval(async () => {
       try {
         const result = await scanAndAlert("bsc", false);
+
         console.log("Auto alert result:", {
           total: result.total,
           alertCandidates: result.alertCandidates,
-          sentCount: result.sentCount
+          selectedForSend: result.selectedForSend,
+          sentCount: result.sentCount,
+          mode: result.mode
         });
       } catch (err) {
         console.log("Auto alert error:", err.message);
