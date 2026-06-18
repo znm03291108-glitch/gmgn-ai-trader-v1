@@ -14,15 +14,16 @@ const AUTO_ALERT = String(process.env.AUTO_ALERT || "false").toLowerCase() === "
 const SCAN_INTERVAL_SECONDS = Number(process.env.SCAN_INTERVAL_SECONDS || 60);
 
 /**
- * GMGN AI Trader V1.2.5
- * 黑名单 / 白名单过滤版
+ * GMGN AI Trader V1.2.6
+ * 信号质量增强版
  *
  * 说明：
- * 1. 正常推送：严格按照提醒规则筛选。
- * 2. 强制推送：只用于测试 Telegram，绕过规则，只推送 1 个币。
- * 3. 黑名单：命中后不推送。
- * 4. 白名单：标记为重点观察，优先推送。
- * 5. 不连接钱包，不自动买入。
+ * 1. 只提醒，不自动买入。
+ * 2. 保留黑名单 / 白名单。
+ * 3. 新增信号质量评分 signal。
+ * 4. 新增推荐等级 S / A / B / C。
+ * 5. 正常推送只推真实符合规则的币。
+ * 6. 强制推送只测试 Telegram。
  */
 
 function parseListEnv(value) {
@@ -46,7 +47,13 @@ const ALERT_RULES = {
   minChange1h: Number(process.env.MIN_CHANGE_1H || 0),
   maxChange1h: Number(process.env.MAX_CHANGE_1H || 30),
   maxAlertsPerRun: Number(process.env.MAX_ALERTS_PER_RUN || 3),
-  cooldownHours: Number(process.env.ALERT_COOLDOWN_HOURS || 24)
+  cooldownHours: Number(process.env.ALERT_COOLDOWN_HOURS || 24),
+
+  // V1.2.6 新增：信号质量规则
+  minSignalScore: Number(process.env.MIN_SIGNAL_SCORE || 70),
+  maxOldAgeMinutes: Number(process.env.MAX_OLD_AGE_MINUTES || 43200),
+  healthyChange1hMin: Number(process.env.HEALTHY_CHANGE_1H_MIN || 0),
+  healthyChange1hMax: Number(process.env.HEALTHY_CHANGE_1H_MAX || 25)
 };
 
 const sentAlertMap = new Map();
@@ -156,6 +163,130 @@ function calcRiskScore(token) {
   };
 }
 
+function calcSignalQuality(token) {
+  let score = 0;
+  const reasons = [];
+
+  const liquidity = Number(token.liquidity || 0);
+  const volume24h = Number(token.volume24h || 0);
+  const change1h = Number(token.priceChange1h || 0);
+  const ageMinutes = Number(token.ageMinutes || 0);
+  const riskScore = token.risk ? Number(token.risk.score || 0) : 0;
+
+  // 风险评分
+  if (riskScore >= 90) {
+    score += 20;
+    reasons.push("风险评分较高");
+  } else if (riskScore >= 75) {
+    score += 10;
+    reasons.push("风险评分一般");
+  } else {
+    reasons.push("风险评分偏低");
+  }
+
+  // 流动性
+  if (liquidity >= 1000000) {
+    score += 25;
+    reasons.push("流动性充足");
+  } else if (liquidity >= 300000) {
+    score += 18;
+    reasons.push("流动性达标");
+  } else if (liquidity >= 100000) {
+    score += 8;
+    reasons.push("流动性一般");
+  } else {
+    reasons.push("流动性不足");
+  }
+
+  // 24H 成交量
+  if (volume24h >= 5000000) {
+    score += 25;
+    reasons.push("24H交易量强");
+  } else if (volume24h >= 1000000) {
+    score += 18;
+    reasons.push("24H交易量达标");
+  } else if (volume24h >= 300000) {
+    score += 8;
+    reasons.push("24H交易量一般");
+  } else {
+    reasons.push("24H交易量不足");
+  }
+
+  // 1H 涨幅结构
+  if (change1h >= 3 && change1h <= 20) {
+    score += 20;
+    reasons.push("1小时涨幅健康");
+  } else if (change1h >= 0 && change1h < 3) {
+    score += 10;
+    reasons.push("1小时涨幅偏弱");
+  } else if (change1h > 20 && change1h <= 30) {
+    score += 8;
+    reasons.push("1小时涨幅较高，注意追高");
+  } else if (change1h < 0) {
+    score -= 10;
+    reasons.push("1小时涨幅为负");
+  } else if (change1h > 30) {
+    score -= 15;
+    reasons.push("1小时涨幅过高，追高风险");
+  }
+
+  // 新盘时间结构
+  if (ageMinutes >= 60 && ageMinutes <= 1440) {
+    score += 20;
+    reasons.push("新盘时间较合适");
+  } else if (ageMinutes > 1440 && ageMinutes <= 10080) {
+    score += 12;
+    reasons.push("上线时间正常");
+  } else if (ageMinutes > 10080 && ageMinutes <= ALERT_RULES.maxOldAgeMinutes) {
+    score += 4;
+    reasons.push("上线时间偏久");
+  } else if (ageMinutes > ALERT_RULES.maxOldAgeMinutes) {
+    score -= 15;
+    reasons.push("老币时间过久");
+  } else {
+    reasons.push("新盘时间过短或未知");
+  }
+
+  if (token.isWhitelisted) {
+    score += 10;
+    reasons.push("白名单重点观察");
+  }
+
+  if (token.isBlacklisted) {
+    score -= 50;
+    reasons.push("命中黑名单");
+  }
+
+  if (score > 100) score = 100;
+  if (score < 0) score = 0;
+
+  let grade = "C";
+  let label = "过滤";
+  let advice = "暂不建议关注";
+
+  if (score >= 85) {
+    grade = "S";
+    label = "重点观察";
+    advice = "信号质量较强，可加入重点观察，但不要重仓";
+  } else if (score >= 70) {
+    grade = "A";
+    label = "可以观察";
+    advice = "信号质量达标，可以观察，不建议重仓";
+  } else if (score >= 50) {
+    grade = "B";
+    label = "普通观察";
+    advice = "信号一般，只适合观察";
+  }
+
+  return {
+    score,
+    grade,
+    label,
+    advice,
+    reasons
+  };
+}
+
 function normalizeDexToken(pair, chain) {
   const base = pair.baseToken || {};
   const createdAt = pair.pairCreatedAt || 0;
@@ -219,7 +350,7 @@ async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
       signal: controller.signal,
       headers: {
         accept: "application/json",
-        "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.2.5"
+        "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.2.6"
       }
     });
 
@@ -315,7 +446,9 @@ function checkListStatus(token) {
 
 function getAlertDecision(token) {
   const risk = token.risk || {};
+  const signal = token.signal || {};
   const score = Number(risk.score || 0);
+  const signalScore = Number(signal.score || 0);
   const liquidity = Number(token.liquidity || 0);
   const volume24h = Number(token.volume24h || 0);
   const change1h = Number(token.priceChange1h || 0);
@@ -339,7 +472,8 @@ function getAlertDecision(token) {
     failed.push("命中合约地址黑名单");
   }
 
-  if (score < ALERT_RULES.minScore) failed.push(`评分低于 ${ALERT_RULES.minScore}`);
+  if (score < ALERT_RULES.minScore) failed.push(`风险评分低于 ${ALERT_RULES.minScore}`);
+  if (signalScore < ALERT_RULES.minSignalScore) failed.push(`信号评分低于 ${ALERT_RULES.minSignalScore}`);
   if (liquidity < ALERT_RULES.minLiquidity) failed.push(`流动性低于 ${money(ALERT_RULES.minLiquidity)}`);
   if (volume24h < ALERT_RULES.minVolume24h) failed.push(`24H交易量低于 ${money(ALERT_RULES.minVolume24h)}`);
   if (ageMinutes < ALERT_RULES.minAgeMinutes) failed.push(`新盘时间小于 ${ALERT_RULES.minAgeMinutes} 分钟`);
@@ -362,11 +496,12 @@ function getAlertDecision(token) {
 
 function buildTelegramMessage(token, force = false, listStatus = {}) {
   const risk = token.risk || {};
+  const signal = token.signal || {};
   const whiteTag = listStatus.isWhitelisted ? "⭐ 白名单重点观察" : "";
   const blackTag = listStatus.isBlacklisted ? "⛔ 黑名单命中" : "";
 
   return [
-    force ? "🧪 GMGN AI Trader V1.2.5 强制测试提醒" : "🚨 GMGN AI Trader V1.2.5 精准候选币提醒",
+    force ? "🧪 GMGN AI Trader V1.2.6 强制测试提醒" : "🚨 GMGN AI Trader V1.2.6 精准候选币提醒",
     "",
     force ? "模式：强制测试模式，已绕过过滤规则，不代表真实符合条件。" : "模式：正常精准过滤模式，已通过提醒规则。",
     whiteTag,
@@ -377,6 +512,8 @@ function buildTelegramMessage(token, force = false, listStatus = {}) {
     `链：${token.chain}`,
     `风险评分：${risk.score}/100`,
     `风险等级：${risk.level}`,
+    `信号评分：${signal.score}/100`,
+    `推荐等级：${signal.grade}级 - ${signal.label}`,
     "",
     `价格：${token.price}`,
     `流动性：${money(token.liquidity)}`,
@@ -384,7 +521,8 @@ function buildTelegramMessage(token, force = false, listStatus = {}) {
     `1小时涨幅：${Number(token.priceChange1h || 0).toFixed(2)}%`,
     `新盘时间：${Number(token.ageMinutes || 0)} 分钟`,
     "",
-    `AI建议：${risk.advice || "仅供观察"}`,
+    `AI建议：${signal.advice || risk.advice || "仅供观察"}`,
+    `信号原因：${signal.reasons && signal.reasons.length ? signal.reasons.join("、") : "暂无"}`,
     `风险原因：${risk.reasons && risk.reasons.length ? risk.reasons.join("、") : "暂未发现明显高危项"}`,
     "",
     "合约地址：",
@@ -393,7 +531,7 @@ function buildTelegramMessage(token, force = false, listStatus = {}) {
     token.gmgnUrl ? `GMGN：${token.gmgnUrl}` : "",
     token.dexUrl ? `Dex：${token.dexUrl}` : "",
     "",
-    `提醒规则：评分>=${ALERT_RULES.minScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，1H涨幅 ${ALERT_RULES.minChange1h}%~${ALERT_RULES.maxChange1h}%`,
+    `提醒规则：风险评分>=${ALERT_RULES.minScore}，信号评分>=${ALERT_RULES.minSignalScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，1H涨幅 ${ALERT_RULES.minChange1h}%~${ALERT_RULES.maxChange1h}%`,
     "",
     "提醒：这不是投资建议，不要重仓跟买。"
   ].filter(Boolean).join("\n");
@@ -454,17 +592,21 @@ async function scanTokens(chain = "bsc") {
   }
 
   tokens = tokens.map((token) => {
-    const withRisk = {
+    const risk = calcRiskScore(token);
+    const listStatus = checkListStatus(token);
+
+    const baseToken = {
       ...token,
-      risk: calcRiskScore(token)
-    };
-
-    const listStatus = checkListStatus(withRisk);
-
-    return {
-      ...withRisk,
+      risk,
       isWhitelisted: listStatus.isWhitelisted,
       isBlacklisted: listStatus.isBlacklisted
+    };
+
+    const signal = calcSignalQuality(baseToken);
+
+    return {
+      ...baseToken,
+      signal
     };
   });
 
@@ -490,6 +632,9 @@ async function scanAndAlert(chain = "bsc", force = false) {
       symbol: token.symbol,
       address: token.address,
       score: token.risk ? token.risk.score : 0,
+      signalScore: token.signal ? token.signal.score : 0,
+      signalGrade: token.signal ? token.signal.grade : "C",
+      signalLabel: token.signal ? token.signal.label : "过滤",
       liquidity: token.liquidity,
       volume24h: token.volume24h,
       change1h: token.priceChange1h,
@@ -530,8 +675,11 @@ async function scanAndAlert(chain = "bsc", force = false) {
       .sort((a, b) => {
         const aw = a.decision.isWhitelisted ? 1 : 0;
         const bw = b.decision.isWhitelisted ? 1 : 0;
-
         if (bw !== aw) return bw - aw;
+
+        const as = Number(a.token.signal ? a.token.signal.score : 0);
+        const bs = Number(b.token.signal ? b.token.signal.score : 0);
+        if (bs !== as) return bs - as;
 
         const av = Number(a.token.volume24h || 0);
         const bv = Number(b.token.volume24h || 0);
@@ -559,7 +707,9 @@ async function scanAndAlert(chain = "bsc", force = false) {
         address: token.address,
         mode: force ? "force-test" : "normal-alert",
         isWhitelisted: listStatus.isWhitelisted,
-        isBlacklisted: listStatus.isBlacklisted
+        isBlacklisted: listStatus.isBlacklisted,
+        signalScore: token.signal ? token.signal.score : 0,
+        signalGrade: token.signal ? token.signal.grade : "C"
       });
     } else {
       failedSend.push({
@@ -578,7 +728,7 @@ async function scanAndAlert(chain = "bsc", force = false) {
     mode: force ? "force-test" : "normal-alert",
     note: force
       ? "强制测试模式：只用于测试 Telegram，已绕过过滤规则，不代表真实符合条件。"
-      : "正常精准过滤模式：只推送真实符合规则且未命中黑名单的币。",
+      : "正常精准过滤模式：只推送真实符合规则、信号评分达标且未命中黑名单的币。",
     alertCandidates: realCandidates.length,
     selectedForSend: selected.length,
     sentCount: sent.length,
@@ -590,9 +740,9 @@ async function scanAndAlert(chain = "bsc", force = false) {
 
 app.get("/", (req, res) => {
   res.json({
-    name: "GMGN AI Trader V1.2.5",
+    name: "GMGN AI Trader V1.2.6",
     status: "运行中",
-    mode: "黑名单白名单过滤版",
+    mode: "信号质量增强版",
     trading: false,
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     autoAlert: AUTO_ALERT,
@@ -607,7 +757,7 @@ app.get("/", (req, res) => {
 app.get("/api/config", (req, res) => {
   res.json({
     ok: true,
-    version: "V1.2.5",
+    version: "V1.2.6",
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     autoAlert: AUTO_ALERT,
     scanIntervalSeconds: SCAN_INTERVAL_SECONDS,
@@ -622,7 +772,7 @@ app.get("/api/config", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    version: "V1.2.5",
+    version: "V1.2.6",
     telegramConfigured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID),
     time: new Date().toISOString()
   });
@@ -630,15 +780,15 @@ app.get("/api/health", (req, res) => {
 
 app.get("/api/telegram/test", async (req, res) => {
   const text = [
-    "✅ GMGN AI Trader V1.2.5 Telegram 测试成功",
+    "✅ GMGN AI Trader V1.2.6 Telegram 测试成功",
     "",
-    "黑名单 / 白名单过滤版已上线。",
+    "信号质量增强版已上线。",
     "",
     `黑名单符号：${BLACKLIST_SYMBOLS.length ? BLACKLIST_SYMBOLS.join(", ") : "未设置"}`,
     `黑名单地址数量：${BLACKLIST_ADDRESSES.length}`,
     `白名单地址数量：${WHITELIST_ADDRESSES.length}`,
     "",
-    `规则：评分>=${ALERT_RULES.minScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，每次最多${ALERT_RULES.maxAlertsPerRun}个。`,
+    `规则：风险评分>=${ALERT_RULES.minScore}，信号评分>=${ALERT_RULES.minSignalScore}，流动性>=${money(ALERT_RULES.minLiquidity)}，24H量>=${money(ALERT_RULES.minVolume24h)}，每次最多${ALERT_RULES.maxAlertsPerRun}个。`,
     "",
     "当前模式：只提醒，不自动买入。"
   ].join("\n");
@@ -647,7 +797,7 @@ app.get("/api/telegram/test", async (req, res) => {
 
   res.json({
     ok: result.ok,
-    version: "V1.2.5",
+    version: "V1.2.6",
     result
   });
 });
@@ -668,7 +818,7 @@ app.get("/api/scan", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.2.5",
+      version: "V1.2.6",
       source: result.source,
       chain,
       tradingEnabled: false,
@@ -680,14 +830,24 @@ app.get("/api/scan", async (req, res) => {
       tokens: result.tokens
     });
   } catch (error) {
-    const tokens = mockTokens(chain).map((token) => ({
-      ...token,
-      risk: calcRiskScore(token)
-    }));
+    const tokens = mockTokens(chain).map((token) => {
+      const risk = calcRiskScore(token);
+      const baseToken = {
+        ...token,
+        risk,
+        isWhitelisted: false,
+        isBlacklisted: false
+      };
+
+      return {
+        ...baseToken,
+        signal: calcSignalQuality(baseToken)
+      };
+    });
 
     res.json({
       ok: true,
-      version: "V1.2.5",
+      version: "V1.2.6",
       source: "demo-after-error",
       chain,
       tradingEnabled: false,
@@ -708,7 +868,7 @@ app.get("/api/alert/run", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.2.5",
+      version: "V1.2.6",
       chain,
       result,
       time: new Date().toISOString()
@@ -716,14 +876,14 @@ app.get("/api/alert/run", async (req, res) => {
   } catch (err) {
     res.json({
       ok: false,
-      version: "V1.2.5",
+      version: "V1.2.6",
       error: err.message
     });
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("GMGN AI Trader V1.2.5 running on port " + PORT);
+  console.log("GMGN AI Trader V1.2.6 running on port " + PORT);
 
   if (AUTO_ALERT) {
     const intervalMs = Math.max(60, SCAN_INTERVAL_SECONDS) * 1000;
