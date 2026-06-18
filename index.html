@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.1 真实数据版</title>
+  <title>GMGN AI Trader V1.2.2 专业控制台</title>
   <style>
     body {
       margin: 0;
@@ -11,28 +11,33 @@
       color: #f4f7fb;
       font-family: Arial, "Microsoft YaHei", sans-serif;
     }
+
     .page {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: auto;
       padding: 14px;
     }
+
     .hero {
       background: linear-gradient(135deg, #101827, #172033);
       border: 1px solid #243044;
       border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
     }
+
     .hero h1 {
       margin: 0 0 8px;
       font-size: 24px;
       line-height: 1.3;
     }
+
     .hero p {
       color: #aebbd0;
       line-height: 1.7;
       margin: 8px 0;
     }
+
     .warning {
       background: rgba(255, 173, 51, 0.12);
       border: 1px solid rgba(255, 173, 51, 0.4);
@@ -41,47 +46,102 @@
       margin: 12px 0;
       color: #ffd38a;
       line-height: 1.6;
+      font-size: 14px;
     }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      background: #111827;
+      border: 1px solid #26344d;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .status-line {
+      color: #aebbd0;
+      font-size: 14px;
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .ok {
+      color: #81f0a4;
+      font-weight: bold;
+    }
+
+    .bad {
+      color: #ff8b8b;
+      font-weight: bold;
+    }
+
+    .mid {
+      color: #ffd38a;
+      font-weight: bold;
+    }
+
     .toolbar {
       display: flex;
       gap: 10px;
-      margin: 16px 0;
+      margin: 14px 0;
       flex-wrap: wrap;
     }
+
     select, button {
       border: none;
       border-radius: 12px;
       padding: 12px 14px;
       font-size: 15px;
     }
+
     select {
       background: #111827;
       color: #fff;
       border: 1px solid #2b3a52;
     }
+
     button {
       background: #2f7cff;
       color: white;
       font-weight: bold;
       cursor: pointer;
     }
+
     button.secondary {
       background: #172033;
       border: 1px solid #2b3a52;
       color: #dce8ff;
     }
+
+    button.danger-btn {
+      background: #8b2f2f;
+      color: white;
+    }
+
     .status {
       color: #aebbd0;
       font-size: 14px;
       line-height: 1.7;
       margin: 12px 0;
     }
+
     .filterbar {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       margin: 12px 0;
     }
+
     .chip {
       border-radius: 999px;
       padding: 8px 12px;
@@ -91,39 +151,46 @@
       font-size: 13px;
       cursor: pointer;
     }
+
     .chip.active {
       background: #2f7cff;
       border-color: #2f7cff;
       color: white;
     }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
       gap: 14px;
     }
+
     .card {
       background: #111827;
       border: 1px solid #26344d;
       border-radius: 18px;
       padding: 16px;
     }
+
     .top {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       align-items: flex-start;
     }
+
     .symbol {
       font-size: 20px;
       font-weight: bold;
       word-break: break-word;
     }
+
     .name {
       color: #aebbd0;
       font-size: 13px;
       margin-top: 4px;
       word-break: break-word;
     }
+
     .level {
       padding: 6px 10px;
       border-radius: 999px;
@@ -131,17 +198,20 @@
       background: #222f45;
       white-space: nowrap;
     }
+
     .score {
       font-size: 36px;
       font-weight: bold;
       margin: 14px 0 4px;
     }
+
     .meta {
       color: #aebbd0;
       font-size: 14px;
       line-height: 1.8;
       word-break: break-word;
     }
+
     .reason {
       background: #0b1220;
       padding: 10px;
@@ -151,18 +221,21 @@
       font-size: 14px;
       line-height: 1.6;
     }
+
     .advice {
       margin-top: 12px;
       font-weight: bold;
       color: #8fd3ff;
       line-height: 1.6;
     }
+
     .actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       margin-top: 12px;
     }
+
     .mini-btn {
       background: #172033;
       color: #dce8ff;
@@ -174,19 +247,37 @@
       text-decoration: none;
       display: inline-block;
     }
+
+    .logbox {
+      background: #0b1220;
+      border: 1px solid #26344d;
+      border-radius: 14px;
+      padding: 12px;
+      color: #d9e2f1;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 260px;
+      overflow: auto;
+    }
+
     .footer {
       margin-top: 20px;
       color: #8190a8;
       font-size: 13px;
       line-height: 1.6;
     }
-    .danger {
-      color: #ff8b8b;
-    }
-    .good {
+
+    .green {
       color: #81f0a4;
     }
-    .mid {
+
+    .red {
+      color: #ff8b8b;
+    }
+
+    .yellow {
       color: #ffd38a;
     }
   </style>
@@ -194,45 +285,76 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.1 真实热门币风险扫描</h1>
-      <p>扫描真实热门 Meme 币数据，计算风险评分，给出观察 / 试单 / 禁止买入建议。V1.1 不自动买入，不连接钱包。</p>
+      <h1>GMGN AI Trader V1.2.2 专业控制台</h1>
+      <p>真实热门币风险扫描 + Telegram 精准提醒控制台。当前版本只提醒，不连接钱包，不自动买入。</p>
       <div class="warning">
-        风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要直接重仓跟买。
+        风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。
       </div>
     </div>
 
-    <div class="toolbar">
-      <select id="chain">
-        <option value="bsc">BSC</option>
-        <option value="sol">Solana</option>
-        <option value="eth">Ethereum</option>
-        <option value="base">Base</option>
-      </select>
-      <button onclick="scan()">开始扫描</button>
-      <button class="secondary" onclick="autoRefresh()">自动刷新</button>
+    <div class="grid">
+      <div class="panel">
+        <h2>后端状态</h2>
+        <div id="backendStatus" class="status-line">正在读取后端状态...</div>
+      </div>
+
+      <div class="panel">
+        <h2>Telegram 状态</h2>
+        <div id="telegramStatus" class="status-line">正在检查 Telegram 配置...</div>
+      </div>
+
+      <div class="panel">
+        <h2>提醒规则</h2>
+        <div id="rulesBox" class="status-line">正在读取提醒规则...</div>
+      </div>
     </div>
 
-    <div class="filterbar">
-      <div class="chip active" onclick="setFilter('all', this)">全部</div>
-      <div class="chip" onclick="setFilter('safe', this)">只看低风险</div>
-      <div class="chip" onclick="setFilter('watch', this)">观察区</div>
-      <div class="chip" onclick="setFilter('danger', this)">高风险</div>
+    <div class="panel">
+      <h2>控制台操作</h2>
+      <div class="toolbar">
+        <select id="chain">
+          <option value="bsc">BSC</option>
+          <option value="sol">Solana</option>
+          <option value="eth">Ethereum</option>
+          <option value="base">Base</option>
+        </select>
+
+        <button onclick="scan()">开始扫描</button>
+        <button class="secondary" onclick="autoRefresh()">自动刷新</button>
+        <button class="secondary" onclick="testTelegram()">测试 Telegram</button>
+        <button class="secondary" onclick="runAlert(false)">手动推送提醒</button>
+        <button class="danger-btn" onclick="runAlert(true)">强制测试推送</button>
+      </div>
+
+      <div id="status" class="status">等待操作...</div>
+
+      <div class="filterbar">
+        <div class="chip active" onclick="setFilter('all', this)">全部</div>
+        <div class="chip" onclick="setFilter('safe', this)">只看低风险</div>
+        <div class="chip" onclick="setFilter('watch', this)">观察区</div>
+        <div class="chip" onclick="setFilter('danger', this)">高风险</div>
+      </div>
     </div>
 
-    <div id="status" class="status">等待扫描...</div>
-    <div id="cards" class="cards"></div>
+    <div class="panel" style="margin-top: 14px;">
+      <h2>操作结果</h2>
+      <div id="consoleLog" class="logbox">暂无操作结果。</div>
+    </div>
+
+    <div id="cards" class="cards" style="margin-top: 14px;"></div>
 
     <div class="footer">
-      当前版本：V1.1 真实数据版。后续可升级：Telegram 提醒、钱包追踪、黑名单、白名单、小额自动交易、自动止盈止损。
+      当前版本：V1.2.2 前端专业控制台版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
     </div>
   </div>
 
   <script>
-    const API_BASE = "https://gmgn-ai-trader-v1-production.up.railway.app";
+    const API_BASE = "https://gmgn-ai-trader-v1-production-77e2.up.railway.app";
 
     let allTokens = [];
     let currentFilter = "all";
     let timer = null;
+    let config = null;
 
     function money(v) {
       const n = Number(v || 0);
@@ -249,6 +371,52 @@
       if (n < 0.000001) return n.toExponential(3);
       if (n < 0.01) return n.toPrecision(4);
       return n.toFixed(6);
+    }
+
+    function log(text, obj) {
+      const box = document.getElementById("consoleLog");
+      const now = new Date().toLocaleTimeString();
+
+      if (obj) {
+        box.innerText = `[${now}] ${text}\n\n` + JSON.stringify(obj, null, 2);
+      } else {
+        box.innerText = `[${now}] ${text}`;
+      }
+    }
+
+    async function loadConfig() {
+      try {
+        const res = await fetch(`${API_BASE}/api/config`);
+        const data = await res.json();
+        config = data;
+
+        document.getElementById("backendStatus").innerHTML = `
+          版本：<span class="ok">${data.version || "-"}</span><br/>
+          自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
+          扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
+          已提醒缓存：${data.sentCacheSize || 0} 个
+        `;
+
+        document.getElementById("telegramStatus").innerHTML = `
+          Telegram：${data.telegramConfigured ? '<span class="ok">已配置成功</span>' : '<span class="bad">未配置</span>'}<br/>
+          当前模式：<span class="mid">只提醒，不自动买入</span>
+        `;
+
+        const r = data.rules || {};
+        document.getElementById("rulesBox").innerHTML = `
+          最低评分：<span class="ok">${r.minScore}</span><br/>
+          最低流动性：<span class="ok">${money(r.minLiquidity)}</span><br/>
+          最低24H量：<span class="ok">${money(r.minVolume24h)}</span><br/>
+          1H涨幅范围：<span class="ok">${r.minChange1h}% ~ ${r.maxChange1h}%</span><br/>
+          新盘时间：<span class="ok">${r.minAgeMinutes} ~ ${r.maxAgeMinutes} 分钟</span><br/>
+          每次最多推送：<span class="ok">${r.maxAlertsPerRun}</span><br/>
+          重复提醒冷却：<span class="ok">${r.cooldownHours} 小时</span>
+        `;
+      } catch (err) {
+        document.getElementById("backendStatus").innerHTML = `<span class="bad">后端状态读取失败</span>`;
+        document.getElementById("telegramStatus").innerHTML = `<span class="bad">Telegram 状态读取失败</span>`;
+        document.getElementById("rulesBox").innerHTML = `<span class="bad">规则读取失败</span>`;
+      }
     }
 
     function setFilter(type, el) {
@@ -292,7 +460,7 @@
       cards.innerHTML = list.map(token => {
         const risk = token.risk || {};
         const score = Number(risk.score || 0);
-        const scoreClass = score >= 75 ? "good" : score < 50 ? "danger" : "mid";
+        const scoreClass = score >= 75 ? "green" : score < 50 ? "red" : "yellow";
 
         return `
           <div class="card">
@@ -350,16 +518,87 @@
 
         if (!data.ok) {
           status.innerText = "扫描失败：" + (data.message || "未知错误");
+          log("扫描失败", data);
           return;
         }
 
         allTokens = data.tokens || [];
 
-        status.innerText = `扫描完成｜版本：${data.version || "V1.1"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
+        status.innerText = `扫描完成｜版本：${data.version || "V1.2.2"}｜数据源：${data.source}｜数量：${allTokens.length}｜更新时间：${data.updateTime}`;
+
+        log("扫描完成", {
+          version: data.version,
+          source: data.source,
+          chain: data.chain,
+          count: allTokens.length
+        });
 
         render();
       } catch (err) {
         status.innerText = "请求失败，请检查 Railway 后端地址是否正确。";
+        log("请求失败：" + err.message);
+      }
+    }
+
+    async function testTelegram() {
+      const status = document.getElementById("status");
+      status.innerText = "正在发送 Telegram 测试消息...";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/telegram/test`);
+        const data = await res.json();
+
+        if (data.ok) {
+          status.innerText = "Telegram 测试成功，请查看机器人消息。";
+        } else {
+          status.innerText = "Telegram 测试失败。";
+        }
+
+        log("Telegram 测试结果", data);
+        loadConfig();
+      } catch (err) {
+        status.innerText = "Telegram 测试请求失败。";
+        log("Telegram 测试请求失败：" + err.message);
+      }
+    }
+
+    async function runAlert(force) {
+      const chain = document.getElementById("chain").value;
+      const status = document.getElementById("status");
+
+      status.innerText = force ? "正在强制测试推送..." : "正在执行精准提醒扫描...";
+
+      try {
+        const url = `${API_BASE}/api/alert/run?chain=${chain}${force ? "&force=1" : ""}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.ok) {
+          status.innerText = "提醒扫描失败。";
+          log("提醒扫描失败", data);
+          return;
+        }
+
+        const result = data.result || {};
+        status.innerText = `提醒扫描完成｜候选：${result.alertCandidates || 0}｜选中：${result.selectedForSend || 0}｜已推送：${result.sentCount || 0}`;
+
+        log(force ? "强制测试推送结果" : "精准提醒扫描结果", {
+          chain: data.chain,
+          source: result.source,
+          total: result.total,
+          alertCandidates: result.alertCandidates,
+          selectedForSend: result.selectedForSend,
+          sentCount: result.sentCount,
+          sent: result.sent,
+          failedSend: result.failedSend,
+          rules: result.rules,
+          diagnosticsPreview: (result.diagnostics || []).slice(0, 5)
+        });
+
+        loadConfig();
+      } catch (err) {
+        status.innerText = "提醒扫描请求失败。";
+        log("提醒扫描请求失败：" + err.message);
       }
     }
 
@@ -376,6 +615,7 @@
       alert("已开启自动刷新：每30秒刷新一次");
     }
 
+    loadConfig();
     scan();
   </script>
 </body>
