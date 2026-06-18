@@ -307,7 +307,70 @@ function mockTokens(chain = "bsc") {
   ];
 }
 
-async function fetchGmgnTrending(chain) {
+async function fetchDexFallback(chain) {
+  const chainIdMap = {
+    bsc: "bsc",
+    eth: "ethereum",
+    base: "base",
+    sol: "solana"
+  };
+
+  const targetChain = chainIdMap[chain] || "bsc";
+
+  const searchQueries = {
+    bsc: ["BNB", "USDT", "PancakeSwap", "Meme"],
+    eth: ["ETH", "USDT", "Uniswap", "Meme"],
+    base: ["BASE", "WETH", "Aerodrome", "Meme"],
+    sol: ["SOL", "USDC", "Raydium", "Meme"]
+  };
+
+  const queries = searchQueries[chain] || searchQueries.bsc;
+  let allPairs = [];
+
+  for (const q of queries) {
+    try {
+      const url = `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`;
+      const res = await fetch(url, {
+        headers: {
+          "accept": "application/json",
+          "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.1.1"
+        }
+      });
+
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const pairs = Array.isArray(data.pairs) ? data.pairs : [];
+
+      const filtered = pairs.filter((p) => {
+        const cid = String(p.chainId || "").toLowerCase();
+        return cid === targetChain;
+      });
+
+      allPairs.push(...filtered);
+    } catch (e) {
+      continue;
+    }
+  }
+
+  const seen = new Set();
+
+  return allPairs
+    .filter((p) => {
+      const base = p.baseToken || {};
+      const key = `${p.chainId}-${base.address}`;
+      if (!base.address || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => {
+      const bv = toNumber(b.volume && b.volume.h24);
+      const av = toNumber(a.volume && a.volume.h24);
+      return bv - av;
+    })
+    .slice(0, 20)
+    .map((p) => normalizeDexToken(p, chain));
+}
   const gmgnChain = CHAIN_MAP[chain] || "bsc";
 
   const urls = [
@@ -409,8 +472,8 @@ app.get("/api/scan", async (req, res) => {
     }
 
     if (!tokens.length) {
-      source = "demo";
-      tokens = mockTokens(chain);
+  source = "demo-no-real-data";
+  tokens = mockTokens(chain);
     }
 
     tokens = tokens.map((token) => ({
