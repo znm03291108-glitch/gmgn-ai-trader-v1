@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.2.4 推送诊断版</title>
+  <title>GMGN AI Trader V1.2.5 黑白名单过滤控制台
   <style>
     body {
       margin: 0;
@@ -346,7 +346,7 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.2.3 推送诊断控制台</h1>
+      <h1>GMGN AI Trader V1.2.5 黑名单过滤控制台</h1>
       <p>真实热门币风险扫描 + Telegram 精准提醒 + 未推送原因诊断。当前版本只提醒，不连接钱包，不自动买入。</p>
       <div class="warning">
         风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。
@@ -412,7 +412,7 @@
     <div id="cards" class="cards"></div>
 
     <div class="footer">
-      当前版本：V1.2.3 推送诊断显示版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
+      当前版本：V1.2.5 黑名单 / 白名单过滤版。后续可升级：黑名单、白名单、持仓钱包追踪、GMGN 真实安全检测、自动止盈止损。
     </div>
   </div>
 
@@ -460,7 +460,7 @@
 
         document.getElementById("backendStatus").innerHTML = `
           后端版本：<span class="ok">${data.version || "-"}</span><br/>
-          前端版本：<span class="ok">V1.2.3</span><br/>
+          前端版本：<span class="ok">V1.2.5</span><br/>
           自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize || 0} 个
