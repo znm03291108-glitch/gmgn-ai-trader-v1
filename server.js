@@ -3,28 +3,23 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
 /**
- * GMGN AI Trader V1.1
- * 真实热门币数据版
+ * GMGN AI Trader V1.1.2
+ * 稳定修复版
  *
- * 说明：
- * 1. 优先尝试从 GMGN 公开行情接口读取热门币数据。
- * 2. 如果 GMGN 接口失败，自动切换为 DexScreener 搜索数据。
- * 3. 如果外部接口都失败，才返回 demo 数据，保证页面不会白屏。
- * 4. V1.1 不连接钱包，不自动交易，只做风险扫描。
+ * 目的：
+ * 1. 修复 Railway 502
+ * 2. 后端一定可以启动
+ * 3. 优先读取 DexScreener 真实数据
+ * 4. 失败时自动返回 demo，页面不白屏
+ * 5. 不连接钱包，不自动买入
  */
-
-const CHAIN_MAP = {
-  bsc: "bsc",
-  eth: "eth",
-  base: "base",
-  sol: "sol"
-};
 
 function toNumber(v, fallback = 0) {
   const n = Number(v);
@@ -43,7 +38,6 @@ function calcRiskScore(token) {
 
   const liquidity = toNumber(token.liquidity);
   const volume24h = toNumber(token.volume24h);
-  const top10HolderRate = toNumber(token.top10HolderRate);
   const priceChange1h = toNumber(token.priceChange1h);
   const ageMinutes = toNumber(token.ageMinutes);
   const buyTax = toNumber(token.buyTax);
@@ -57,11 +51,6 @@ function calcRiskScore(token) {
   if (volume24h > 0 && volume24h < 20000) {
     score -= 15;
     reasons.push("24小时交易量偏低");
-  }
-
-  if (top10HolderRate > 45) {
-    score -= 25;
-    reasons.push("前10持仓占比过高");
   }
 
   if (priceChange1h > 150) {
@@ -117,109 +106,6 @@ function calcRiskScore(token) {
   };
 }
 
-function normalizeGmgnToken(raw, chain) {
-  const createdAt =
-    raw.creation_timestamp ||
-    raw.created_at ||
-    raw.open_timestamp ||
-    raw.pool_created_at ||
-    0;
-
-  let ageMinutes = 0;
-  const ts = Number(createdAt);
-  if (ts > 0) {
-    const ms = ts < 10000000000 ? ts * 1000 : ts;
-    ageMinutes = Math.max(0, Math.floor((Date.now() - ms) / 60000));
-  }
-
-  const address =
-    raw.address ||
-    raw.token_address ||
-    raw.base_address ||
-    raw.base_token_address ||
-    raw.id ||
-    "";
-
-  const symbol =
-    raw.symbol ||
-    raw.base_token_symbol ||
-    raw.token_symbol ||
-    "UNKNOWN";
-
-  const name =
-    raw.name ||
-    raw.base_token_name ||
-    raw.token_name ||
-    symbol;
-
-  const liquidity =
-    raw.liquidity ||
-    raw.liquidity_usd ||
-    raw.pool_liquidity ||
-    raw.reserve_usd ||
-    0;
-
-  const volume24h =
-    raw.volume24h ||
-    raw.volume_24h ||
-    raw.volume ||
-    raw.volume_usd ||
-    raw.swap_volume_24h ||
-    0;
-
-  const price =
-    raw.price ||
-    raw.price_usd ||
-    raw.usd_price ||
-    0;
-
-  const priceChange1h =
-    raw.price_change_1h ||
-    raw.price_change_percent1h ||
-    raw.price_change_percent_1h ||
-    raw.change_1h ||
-    0;
-
-  const top10HolderRate =
-    raw.top_10_holder_rate ||
-    raw.top10_holder_rate ||
-    raw.top10HolderRate ||
-    0;
-
-  const buyTax =
-    raw.buy_tax ||
-    raw.buyTax ||
-    0;
-
-  const sellTax =
-    raw.sell_tax ||
-    raw.sellTax ||
-    0;
-
-  const isHoneypot =
-    raw.is_honeypot === true ||
-    raw.honeypot === true ||
-    raw.isHoneypot === true;
-
-  return {
-    symbol,
-    name,
-    chain,
-    address,
-    shortAddress: shortAddress(address),
-    price: toNumber(price),
-    liquidity: toNumber(liquidity),
-    volume24h: toNumber(volume24h),
-    top10HolderRate: toNumber(top10HolderRate),
-    priceChange1h: toNumber(priceChange1h),
-    ageMinutes,
-    buyTax: toNumber(buyTax),
-    sellTax: toNumber(sellTax),
-    isHoneypot,
-    gmgnUrl: address ? `https://gmgn.ai/${chain}/token/${address}` : ""
-  };
-}
-
 function normalizeDexToken(pair, chain) {
   const base = pair.baseToken || {};
   const createdAt = pair.pairCreatedAt || 0;
@@ -268,7 +154,8 @@ function mockTokens(chain = "bsc") {
       buyTax: 3,
       sellTax: 3,
       isHoneypot: false,
-      gmgnUrl: ""
+      gmgnUrl: "",
+      dexUrl: ""
     },
     {
       symbol: "MOONX",
@@ -285,7 +172,8 @@ function mockTokens(chain = "bsc") {
       buyTax: 15,
       sellTax: 20,
       isHoneypot: false,
-      gmgnUrl: ""
+      gmgnUrl: "",
+      dexUrl: ""
     },
     {
       symbol: "DOGE2",
@@ -302,9 +190,36 @@ function mockTokens(chain = "bsc") {
       buyTax: 5,
       sellTax: 5,
       isHoneypot: false,
-      gmgnUrl: ""
+      gmgnUrl: "",
+      dexUrl: ""
     }
   ];
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        accept: "application/json",
+        "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.1.2"
+      }
+    });
+
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+
+    return await res.json();
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
 }
 
 async function fetchDexFallback(chain) {
@@ -318,28 +233,20 @@ async function fetchDexFallback(chain) {
   const targetChain = chainIdMap[chain] || "bsc";
 
   const searchQueries = {
-    bsc: ["BNB", "USDT", "PancakeSwap", "Meme"],
-    eth: ["ETH", "USDT", "Uniswap", "Meme"],
-    base: ["BASE", "WETH", "Aerodrome", "Meme"],
-    sol: ["SOL", "USDC", "Raydium", "Meme"]
+    bsc: ["bnb", "cake", "pancakeswap", "meme"],
+    eth: ["eth", "pepe", "uniswap", "meme"],
+    base: ["base", "weth", "aerodrome", "meme"],
+    sol: ["sol", "raydium", "pump", "meme"]
   };
 
   const queries = searchQueries[chain] || searchQueries.bsc;
-  let allPairs = [];
+  const allPairs = [];
 
   for (const q of queries) {
     try {
       const url = `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`;
-      const res = await fetch(url, {
-        headers: {
-          "accept": "application/json",
-          "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.1.1"
-        }
-      });
+      const data = await fetchJsonWithTimeout(url, 8000);
 
-      if (!res.ok) continue;
-
-      const data = await res.json();
       const pairs = Array.isArray(data.pairs) ? data.pairs : [];
 
       const filtered = pairs.filter((p) => {
@@ -348,8 +255,8 @@ async function fetchDexFallback(chain) {
       });
 
       allPairs.push(...filtered);
-    } catch (e) {
-      continue;
+    } catch (err) {
+      console.log("Dex query failed:", q, err.message);
     }
   }
 
@@ -371,91 +278,21 @@ async function fetchDexFallback(chain) {
     .slice(0, 20)
     .map((p) => normalizeDexToken(p, chain));
 }
-  const gmgnChain = CHAIN_MAP[chain] || "bsc";
-
-  const urls = [
-    `https://gmgn.ai/defi/quotation/v1/rank/${gmgnChain}/swaps/1h?orderby=volume&direction=desc&filters[]=not_honeypot`,
-    `https://gmgn.ai/defi/quotation/v1/rank/${gmgnChain}/swaps/24h?orderby=volume&direction=desc&filters[]=not_honeypot`
-  ];
-
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        headers: {
-          "accept": "application/json",
-          "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.1"
-        }
-      });
-
-      if (!res.ok) continue;
-
-      const data = await res.json();
-
-      let list = [];
-      if (Array.isArray(data)) list = data;
-      if (Array.isArray(data.data)) list = data.data;
-      if (data.data && Array.isArray(data.data.rank)) list = data.data.rank;
-      if (data.data && Array.isArray(data.data.list)) list = data.data.list;
-      if (data.data && Array.isArray(data.data.tokens)) list = data.data.tokens;
-
-      if (list.length > 0) {
-        return list.slice(0, 20).map((item) => normalizeGmgnToken(item, gmgnChain));
-      }
-    } catch (err) {
-      continue;
-    }
-  }
-
-  return [];
-}
-
-async function fetchDexFallback(chain) {
-  const queryMap = {
-    bsc: "bnb",
-    eth: "ethereum",
-    base: "base",
-    sol: "solana"
-  };
-
-  const q = queryMap[chain] || "bnb";
-  const url = `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`;
-
-  const res = await fetch(url, {
-    headers: {
-      "accept": "application/json",
-      "user-agent": "Mozilla/5.0 GMGN-AI-Trader-V1.1"
-    }
-  });
-
-  if (!res.ok) {
-    throw new Error("DexScreener fallback failed");
-  }
-
-  const data = await res.json();
-  const pairs = Array.isArray(data.pairs) ? data.pairs : [];
-
-  const chainIdMap = {
-    bsc: ["bsc"],
-    eth: ["ethereum", "ether"],
-    base: ["base"],
-    sol: ["solana"]
-  };
-
-  const allowed = chainIdMap[chain] || ["bsc"];
-
-  return pairs
-    .filter((p) => allowed.includes(String(p.chainId || "").toLowerCase()))
-    .sort((a, b) => toNumber(b.volume && b.volume.h24) - toNumber(a.volume && a.volume.h24))
-    .slice(0, 20)
-    .map((p) => normalizeDexToken(p, chain));
-}
 
 app.get("/", (req, res) => {
   res.json({
-    name: "GMGN AI Trader V1.1",
+    name: "GMGN AI Trader V1.1.2",
     status: "运行中",
-    mode: "真实数据风险扫描",
+    mode: "稳定真实数据风险扫描",
     trading: false
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    version: "V1.1.2",
+    time: new Date().toISOString()
   });
 });
 
@@ -463,17 +300,12 @@ app.get("/api/scan", async (req, res) => {
   const chain = req.query.chain || "bsc";
 
   try {
-    let source = "gmgn";
-    let tokens = await fetchGmgnTrending(chain);
+    let source = "dexscreener-fallback";
+    let tokens = await fetchDexFallback(chain);
 
     if (!tokens.length) {
-      source = "dexscreener-fallback";
-      tokens = await fetchDexFallback(chain);
-    }
-
-    if (!tokens.length) {
-  source = "demo-no-real-data";
-  tokens = mockTokens(chain);
+      source = "demo-no-real-data";
+      tokens = mockTokens(chain);
     }
 
     tokens = tokens.map((token) => ({
@@ -483,7 +315,7 @@ app.get("/api/scan", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.1",
+      version: "V1.1.2",
       source,
       chain,
       tradingEnabled: false,
@@ -498,7 +330,7 @@ app.get("/api/scan", async (req, res) => {
 
     res.json({
       ok: true,
-      version: "V1.1",
+      version: "V1.1.2",
       source: "demo-after-error",
       chain,
       tradingEnabled: false,
@@ -510,5 +342,5 @@ app.get("/api/scan", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`GMGN AI Trader V1.1 running on port ${PORT}`);
+  console.log(`GMGN AI Trader V1.1.2 running on port ${PORT}`);
 });
