@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.2.7 前端信号显示版</title>
+  <title>GMGN AI Trader V1.2.8 X热度入口版</title>
   <style>
     body {
       margin: 0;
@@ -30,13 +30,13 @@
       background: linear-gradient(135deg, #101827, #172033);
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       margin-top: 0;
     }
 
     .hero h1 {
       font-size: 24px;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .hero p, .status, .meta, .status-line {
@@ -53,11 +53,12 @@
       color: #ffd38a;
       line-height: 1.6;
       font-size: 14px;
+      margin-top: 12px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 12px;
     }
 
@@ -81,7 +82,7 @@
       font-weight: bold;
     }
 
-    .toolbar, .filterbar, .actions {
+    .toolbar, .filterbar, .actions, .sell-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -223,7 +224,7 @@
       line-height: 1.6;
     }
 
-    .mini-btn {
+    .mini-btn, .sell-btn {
       background: #172033;
       color: #dce8ff;
       border: 1px solid #2b3a52;
@@ -233,6 +234,20 @@
       cursor: pointer;
       text-decoration: none;
       display: inline-block;
+    }
+
+    .sell-btn.primary {
+      background: #2f7cff;
+      border-color: #2f7cff;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .sell-btn.gold {
+      background: rgba(255, 173, 51, 0.12);
+      border-color: rgba(255, 173, 51, 0.45);
+      color: #ffd38a;
+      font-weight: bold;
     }
 
     .logbox {
@@ -338,7 +353,7 @@
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
       gap: 10px;
       margin-top: 10px;
     }
@@ -356,6 +371,26 @@
       margin-bottom: 4px;
     }
 
+    .price-card {
+      background: #0b1220;
+      border: 1px solid #26344d;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .price {
+      font-size: 28px;
+      font-weight: bold;
+      color: #81f0a4;
+      margin: 8px 0;
+    }
+
+    .muted {
+      color: #8190a8;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
     .footer {
       margin-top: 20px;
       color: #8190a8;
@@ -368,10 +403,68 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.2.7 前端信号显示控制台</h1>
-      <p>真实热门币风险扫描 + Telegram 精准提醒 + 信号评分 + 推荐等级显示。当前版本只提醒，不连接钱包，不自动买入。</p>
+      <h1>GMGN AI Trader V1.2.8 X 热度入口版</h1>
+      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口。当前版本只做数据观察，不连接钱包，不自动买入。</p>
+
+      <div class="sell-actions">
+        <a class="sell-btn primary" href="#pricing">查看价格</a>
+        <a class="sell-btn gold" href="https://t.me/zleisheng" target="_blank">联系 Telegram</a>
+        <a class="sell-btn" href="#console">进入控制台</a>
+      </div>
+
       <div class="warning">
         风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>这个工具适合谁？</h2>
+      <div class="grid">
+        <div class="price-card">
+          <h3>找新币的人</h3>
+          <div class="muted">每天看 GMGN、DexScreener、Ave、Telegram 群的人，可以用它节省筛币时间。</div>
+        </div>
+        <div class="price-card">
+          <h3>怕踩坑的人</h3>
+          <div class="muted">通过风险评分、信号评分、黑名单、老币过滤，减少无意义币种干扰。</div>
+        </div>
+        <div class="price-card">
+          <h3>需要提醒的人</h3>
+          <div class="muted">支持 Telegram 自动提醒，方便手机端接收候选币观察信息。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="pricing">
+      <h2>价格套餐</h2>
+      <div class="grid">
+        <div class="price-card">
+          <h3>体验版</h3>
+          <div class="price">$9</div>
+          <div class="muted">
+            获得工具体验入口。适合先试用，查看扫描、评分、X 搜索入口和 Telegram 提醒效果。
+          </div>
+        </div>
+
+        <div class="price-card">
+          <h3>部署版</h3>
+          <div class="price">$29</div>
+          <div class="muted">
+            提供独立网页部署教程、Railway 后端、Telegram 机器人配置流程。适合自己长期使用。
+          </div>
+        </div>
+
+        <div class="price-card">
+          <h3>定制版</h3>
+          <div class="price">$99+</div>
+          <div class="muted">
+            帮你部署专属 Meme 币雷达系统，可定制链、提醒规则、黑名单、页面品牌。
+          </div>
+        </div>
+      </div>
+
+      <div class="warning">
+        说明：本工具不保证收益，不提供买卖建议，不代客交易。它只是帮助用户更快观察数据和风险。
       </div>
     </div>
 
@@ -397,7 +490,7 @@
       <div id="listStatusBox" class="status-line">正在读取黑白名单...</div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="console">
       <h2>控制台操作</h2>
 
       <div class="toolbar">
@@ -445,7 +538,7 @@
     <div id="cards" class="cards"></div>
 
     <div class="footer">
-      当前版本：V1.2.7 前端信号显示版。后续可升级：网页添加黑名单、每日汇总、GMGN真实安全接口、模拟交易记录。
+      当前版本：V1.2.8 X 热度入口 + 售卖落地页版。后续可升级：真实 X 热度评分、网页添加黑名单、会员登录码、每日汇总、模拟交易记录。
     </div>
   </div>
 
@@ -490,6 +583,26 @@
       return "red";
     }
 
+    function xSearchUrl(symbol, address, mode) {
+      const s = String(symbol || "").trim();
+      const a = String(address || "").trim();
+
+      let q = s || a;
+
+      if (mode === "cash" && s) {
+        q = "$" + s;
+      } else if (mode === "live" && s) {
+        q = `${s} OR $${s}`;
+      } else if (mode === "address" && a) {
+        q = a;
+      } else if (mode === "hot" && s) {
+        q = `${s} OR $${s} meme coin`;
+      }
+
+      const filter = mode === "live" ? "&f=live" : "";
+      return "https://x.com/search?q=" + encodeURIComponent(q) + "&src=typed_query" + filter;
+    }
+
     function log(text, obj) {
       const box = document.getElementById("consoleLog");
       const now = new Date().toLocaleTimeString();
@@ -509,7 +622,7 @@
 
         document.getElementById("backendStatus").innerHTML = `
           后端版本：<span class="ok">${data.version || "-"}</span><br/>
-          前端版本：<span class="ok">V1.2.7</span><br/>
+          前端版本：<span class="ok">V1.2.8</span><br/>
           自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize || 0} 个
@@ -568,7 +681,7 @@
     async function copyText(text) {
       try {
         await navigator.clipboard.writeText(text);
-        alert("已复制合约地址");
+        alert("已复制");
       } catch (e) {
         alert(text);
       }
@@ -596,11 +709,14 @@
         const blackTag = token.isBlacklisted ? `<span class="tag tag-black">⛔ 黑名单</span>` : "";
         const gradeTag = `<span class="tag ${gradeClass(signal.grade)}">${signal.grade || "C"}级 - ${signal.label || "过滤"}</span>`;
 
+        const symbol = token.symbol || "UNKNOWN";
+        const address = token.address || "";
+
         return `
           <div class="card">
             <div class="top">
               <div>
-                <div class="symbol">${token.symbol || "UNKNOWN"}</div>
+                <div class="symbol">${symbol}</div>
                 <div class="name">${token.name || ""}</div>
               </div>
               <div class="level">${risk.level || "未知"}</div>
@@ -629,7 +745,8 @@
               <div class="meta">
                 推荐等级：<span class="${sigClass}">${signal.grade || "C"}级 - ${signal.label || "过滤"}</span><br/>
                 信号建议：${signal.advice || "暂无"}<br/>
-                信号原因：${signal.reasons && signal.reasons.length ? signal.reasons.join("、") : "暂无"}
+                信号原因：${signal.reasons && signal.reasons.length ? signal.reasons.join("、") : "暂无"}<br/>
+                X热度：<span class="mid">需人工打开 X 确认</span>
               </div>
             </div>
 
@@ -654,9 +771,13 @@
             </div>
 
             <div class="actions">
-              ${token.address ? `<button class="mini-btn" onclick="copyText('${token.address}')">复制合约</button>` : ""}
+              ${address ? `<button class="mini-btn" onclick="copyText('${address}')">复制合约</button>` : ""}
               ${token.gmgnUrl ? `<a class="mini-btn" href="${token.gmgnUrl}" target="_blank">打开 GMGN</a>` : ""}
               ${token.dexUrl ? `<a class="mini-btn" href="${token.dexUrl}" target="_blank">打开 Dex</a>` : ""}
+              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'live')}" target="_blank">X 最新</a>
+              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'cash')}" target="_blank">搜索 $${symbol}</a>
+              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'hot')}" target="_blank">X 热门</a>
+              ${address ? `<a class="mini-btn" href="${xSearchUrl(symbol, address, 'address')}" target="_blank">X 搜合约</a>` : ""}
             </div>
           </div>
         `;
@@ -702,10 +823,12 @@
       listBox.innerHTML = diagnostics.map(d => {
         const failedReasons = d.failed || [];
         const ok = d.canSend;
+        const symbol = d.symbol || "UNKNOWN";
+        const address = d.address || "";
 
         return `
           <div class="diag-card ${ok ? "diag-ok" : "diag-bad"}">
-            <div class="diag-title">${d.symbol || "UNKNOWN"}</div>
+            <div class="diag-title">${symbol}</div>
 
             <div>
               ${ok ? '<span class="tag tag-ok">符合推送</span>' : '<span class="tag tag-bad">未推送</span>'}
@@ -722,6 +845,12 @@
 
             <div class="reason">
               ${ok ? "原因：已符合当前精准提醒规则。" : "未推送原因：" + failedReasons.join("、")}
+            </div>
+
+            <div class="actions">
+              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'live')}" target="_blank">X 最新</a>
+              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'cash')}" target="_blank">搜索 $${symbol}</a>
+              ${address ? `<a class="mini-btn" href="${xSearchUrl(symbol, address, 'address')}" target="_blank">X 搜合约</a>` : ""}
             </div>
           </div>
         `;
