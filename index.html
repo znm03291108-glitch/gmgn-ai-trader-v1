@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.3.4 订单管理会员码版</title>
+  <title>GMGN AI Trader V1.3.6 专业筛选解释版</title>
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#070b12;color:#f4f7fb;font-family:Arial,"Microsoft YaHei",sans-serif}
@@ -70,21 +70,61 @@
     .qr-img{width:260px;height:260px;border-radius:16px;background:#fff;padding:12px;display:block;margin:10px 0}
     .order-item,.admin-item,.code-item{background:#0b1220;border:1px solid #26344d;border-radius:14px;padding:12px;margin-top:10px;color:#d9e2f1;font-size:13px;line-height:1.7;word-break:break-word}
     .admin-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+    .setup-box{background:#070b12;border:1px dashed #36506f;border-radius:14px;padding:12px;margin-top:10px}
     .footer{margin-top:20px;color:#8190a8;font-size:13px;line-height:1.6}
+
+    .funnel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+    .funnel-item{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:12px}
+    .funnel-num{font-size:30px;font-weight:bold;margin-bottom:5px}
+    .funnel-label{color:#aebbd0;font-size:13px;line-height:1.5}
+    .rank-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
+    .rank-card{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:14px}
+    .rank-no{display:inline-block;width:28px;height:28px;border-radius:50%;background:#2f7cff;color:#fff;text-align:center;line-height:28px;font-weight:bold;margin-right:6px}
+    .reason-list{margin:8px 0 0 0;padding:0;list-style:none}
+    .reason-list li{margin:6px 0;color:#d9e2f1;font-size:13px;line-height:1.55}
+    .case-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+    .case-card{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:14px}
+    .case-up{font-size:24px;font-weight:bold;color:#81f0a4;margin:8px 0}
+    .pro-note{background:rgba(143,211,255,.10);border:1px solid rgba(143,211,255,.35);border-radius:14px;padding:12px;color:#bfe8ff;line-height:1.6;font-size:14px;margin-top:12px}
+
   </style>
 </head>
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.3.4 订单管理 + 会员码发放版</h1>
-      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记 + 管理员发码。</p>
+      <h1>GMGN AI Trader V1.3.6 专业筛选解释版</h1>
+      <p>从大量 Meme 新币里自动做初筛：先过滤明显高风险、低流动性、异常波动和老盘，再给出候选榜单、入选原因、过滤原因与 Telegram 提醒。</p>
       <div class="sell-actions">
         <a class="sell-btn primary" href="#pricing">查看价格</a>
         <a class="sell-btn gold" href="#payment">支付方式</a>
         <a class="sell-btn" href="#order">订单登记</a>
-        <a class="sell-btn" href="#member">会员登录</a>
+        <a class="sell-btn" href="#admin">管理员</a>
       </div>
       <div class="warning">风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。</div>
+    </div>
+
+    <div class="panel" id="supabaseSetup">
+      <h2>Supabase 云端状态</h2>
+      <div id="cloudStatus" class="status-line">正在检查 Supabase 配置...</div>
+      <div class="setup-box">
+        <div class="muted">
+          使用前需要把代码顶部的 <b>SUPABASE_URL</b> 和 <b>SUPABASE_ANON_KEY</b> 换成你的 Supabase 项目参数。<br/>
+          如果未配置，订单会自动保存到本地浏览器，方便先测试页面。
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel">
+      <h2>它到底帮你筛什么？</h2>
+      <div class="pro-note">
+        本工具不是“喊单工具”，也不承诺找到百倍币。它的价值是：把一堆新币先按规则过滤，减少你手动翻 GMGN、DexScreener、X/Twitter 的时间。
+      </div>
+      <div class="grid" style="margin-top:12px;">
+        <div class="step-card"><h3>过滤明显垃圾币</h3><div class="muted">低流动性、低交易量、异常涨跌、黑名单关键词、时间过老的币会被优先过滤。</div></div>
+        <div class="step-card"><h3>留下观察候选</h3><div class="muted">符合基础条件的币会进入观察区，再通过信号评分排序。</div></div>
+        <div class="step-card"><h3>解释为什么</h3><div class="muted">每个币都会显示入选原因或过滤原因，不只是给一个分数。</div></div>
+      </div>
     </div>
 
     <div class="panel">
@@ -92,8 +132,8 @@
       <div class="grid">
         <div class="step-card"><h3>1. 选择套餐</h3><div class="muted">体验版、部署版、定制版，根据使用需求选择。</div></div>
         <div class="step-card"><h3>2. USDT 付款</h3><div class="muted">使用 BEP20 / BSC 网络转 USDT 到页面钱包地址。</div></div>
-        <div class="step-card"><h3>3. 填写订单</h3><div class="muted">填写 Telegram、套餐、金额、TXID，方便核对。</div></div>
-        <div class="step-card"><h3>4. 联系客服</h3><div class="muted">发送付款截图或交易哈希，人工确认后发会员码。</div></div>
+        <div class="step-card"><h3>3. 填写订单</h3><div class="muted">填写 Telegram、套餐、金额、TXID，提交到云端订单表。</div></div>
+        <div class="step-card"><h3>4. 管理员发码</h3><div class="muted">管理员确认付款后分配会员码，客户即可登录控制台。</div></div>
       </div>
     </div>
 
@@ -154,7 +194,7 @@
 
     <div class="panel" id="order">
       <h2>订单登记</h2>
-      <div class="muted">付款后请填写订单信息，方便核对并发送会员码。本地演示版订单只保存在当前浏览器。</div>
+      <div class="muted">付款后请填写订单信息。配置 Supabase 后，订单会保存到云端。</div>
       <div class="login-box">
         <input id="orderName" placeholder="你的昵称，例如 Alex" />
         <input id="orderTelegram" placeholder="Telegram 用户名，例如 @yourname" />
@@ -168,8 +208,9 @@
         <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT-BEP20，付款时间，备注"></textarea>
         <div class="sell-actions">
           <button onclick="saveOrder()">提交订单登记</button>
+          <button class="secondary" onclick="loadOrders()">刷新订单</button>
           <button class="secondary" onclick="exportOrders()">导出订单记录</button>
-          <button class="danger-btn" onclick="clearOrders()">清空本地订单</button>
+          <button class="danger-btn" onclick="clearLocalOrders()">清空本地缓存</button>
         </div>
       </div>
       <div id="orderList"></div>
@@ -178,7 +219,7 @@
     <div class="panel" id="admin">
       <h2>管理员订单管理</h2>
       <div id="adminLoginBox" class="login-box">
-        <div class="muted">管理员输入密码后，可以查看订单、标记状态、复制会员码。</div>
+        <div class="muted">管理员输入密码后，可以查看云端订单、标记状态、复制会员码。</div>
         <input id="adminPass" placeholder="请输入管理员密码" type="password" />
         <button onclick="adminLogin()">进入管理员区</button>
       </div>
@@ -197,7 +238,7 @@
         </div>
 
         <div class="sell-actions">
-          <button class="secondary" onclick="renderAdminOrders()">刷新订单</button>
+          <button class="secondary" onclick="loadOrders()">刷新云端订单</button>
           <button class="secondary" onclick="exportOrders()">导出订单</button>
           <button class="gold-btn" onclick="copyAllMemberCodes()">复制全部会员码</button>
           <button class="danger-btn" onclick="adminLogout()">退出管理员</button>
@@ -209,6 +250,30 @@
         <h3>订单列表</h3>
         <div id="adminOrderList"></div>
       </div>
+    </div>
+
+
+    <div class="panel">
+      <h2>历史观察案例</h2>
+      <div class="muted">以下为演示展示区，可后续手动更新真实观察记录。历史表现不代表未来收益。</div>
+      <div class="case-grid" style="margin-top:12px;">
+        <div class="case-card">
+          <h3>案例 A：高流动性观察</h3>
+          <div class="case-up">+18% ~ +43%</div>
+          <div class="muted">特点：流动性较高、24H 交易量活跃、短线涨幅未过热。仅作为筛选逻辑展示。</div>
+        </div>
+        <div class="case-card">
+          <h3>案例 B：风险过滤</h3>
+          <div class="case-up red">已过滤</div>
+          <div class="muted">特点：新盘时间过老、1H 表现转弱、信号评分不足。系统会提示过滤原因。</div>
+        </div>
+        <div class="case-card">
+          <h3>案例 C：观察区</h3>
+          <div class="case-up yellow">继续观察</div>
+          <div class="muted">特点：基础条件达标，但信号评分不够强，适合放入观察区，不适合重仓跟买。</div>
+        </div>
+      </div>
+      <div class="warning">提示：所有案例仅用于展示筛选思路，不构成投资建议。</div>
     </div>
 
     <div class="panel" id="member">
@@ -237,6 +302,26 @@
       </div>
 
       <div class="panel"><h2>黑白名单状态</h2><div id="listStatusBox" class="status-line">正在读取黑白名单...</div></div>
+
+      <div class="panel">
+        <h2>专业筛选漏斗</h2>
+        <div class="muted">扫描后自动显示：从原始币种到候选观察，再到重点关注的筛选过程。</div>
+        <div id="funnelBox" class="funnel-grid">
+          <div class="funnel-item"><div class="funnel-num green">0</div><div class="funnel-label">原始扫描</div></div>
+          <div class="funnel-item"><div class="funnel-num green">0</div><div class="funnel-label">基础通过</div></div>
+          <div class="funnel-item"><div class="funnel-num yellow">0</div><div class="funnel-label">观察候选</div></div>
+          <div class="funnel-item"><div class="funnel-num blue">0</div><div class="funnel-label">重点关注</div></div>
+          <div class="funnel-item"><div class="funnel-num red">0</div><div class="funnel-label">风险过滤</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>今日候选观察榜</h2>
+        <div class="muted">系统会把综合条件更好的币排在前面。这里只代表“值得观察”，不代表建议买入。</div>
+        <div id="candidateRanking" class="rank-list">
+          <div class="muted">请先点击“开始扫描”。</div>
+        </div>
+      </div>
 
       <div class="panel" id="console">
         <h2>控制台操作</h2>
@@ -268,23 +353,54 @@
       <div id="cards" class="cards"></div>
     </div>
 
-    <div class="footer">当前版本：V1.3.4 订单管理 + 会员码发放版。说明：订单和管理员状态保存在本机浏览器，适合第一版售卖测试。</div>
+    <div class="footer">当前版本：V1.3.6 专业筛选解释版。说明：重点增强筛选漏斗、候选榜单、入选原因、过滤原因和历史观察案例。</div>
   </div>
 
   <script>
     const API_BASE = "https://gmgn-ai-trader-v1-production-77e2.up.railway.app";
+
+    // 这里换成你的 Supabase 项目参数
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+    const SUPABASE_TABLE = "gmgn_orders";
+
     const PAYMENT_INFO = {
       network: "BEP20 / BSC",
       walletAddress: "0xBf7ad8f3FD67F2fb70BE75DC5e49Eeb36a821622",
       telegram: "@zleisheng"
     };
-    const ADMIN_PASSWORD = "GMGN134";
-    const VALID_MEMBER_CODES = ["VIP2026","GMGN999","MEME888","RADAR666","BOSS520","TEST123","VIP888","GMGN134","MEME2026","TRADER999"];
+
+    const ADMIN_PASSWORD = "GMGN135";
+    const VALID_MEMBER_CODES = ["VIP2026","GMGN999","MEME888","RADAR666","BOSS520","TEST123","VIP888","GMGN134","GMGN135","MEME2026","TRADER999"];
+
     let allTokens = [];
     let currentFilter = "all";
     let timer = null;
     let isMember = localStorage.getItem("gmgn_member_ok") === "true";
     let isAdmin = localStorage.getItem("gmgn_admin_ok") === "true";
+    let ordersCache = [];
+
+    function isCloudReady(){
+      return SUPABASE_URL.startsWith("https://") && SUPABASE_ANON_KEY.length > 40;
+    }
+
+    function supabaseHeaders(){
+      return {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      };
+    }
+
+    function updateCloudStatus(){
+      const box = document.getElementById("cloudStatus");
+      if(isCloudReady()){
+        box.innerHTML = '<span class="ok">Supabase 已配置：订单将保存到云端。</span>';
+      } else {
+        box.innerHTML = '<span class="bad">Supabase 未配置：</span> 当前使用本地订单模式。请替换 SUPABASE_URL 和 SUPABASE_ANON_KEY。';
+      }
+    }
 
     function copyWallet(){copyText(PAYMENT_INFO.walletAddress)}
     async function copyText(text){
@@ -352,10 +468,28 @@
       },100)
     }
 
-    function getOrders(){try{return JSON.parse(localStorage.getItem("gmgn_orders")||"[]")}catch(e){return []}}
-    function setOrders(orders){localStorage.setItem("gmgn_orders",JSON.stringify(orders))}
+    function getLocalOrders(){try{return JSON.parse(localStorage.getItem("gmgn_orders")||"[]")}catch(e){return []}}
+    function setLocalOrders(orders){localStorage.setItem("gmgn_orders",JSON.stringify(orders))}
 
-    function saveOrder(){
+    function normalizeOrder(o){
+      return {
+        id: o.id || o.order_id || ("GMGN-" + Date.now()),
+        order_id: o.order_id || o.id || ("GMGN-" + Date.now()),
+        name: o.name || "",
+        telegram: o.telegram || "",
+        plan: o.plan || "",
+        amount: o.amount || "",
+        txid: o.txid || "",
+        note: o.note || "",
+        payment_network: o.payment_network || o.paymentNetwork || PAYMENT_INFO.network,
+        wallet_address: o.wallet_address || o.walletAddress || PAYMENT_INFO.walletAddress,
+        status: o.status || "待确认",
+        member_code: o.member_code || o.memberCode || "",
+        created_at: o.created_at || o.time || new Date().toLocaleString()
+      };
+    }
+
+    async function saveOrder(){
       const name=document.getElementById("orderName").value.trim();
       const telegram=document.getElementById("orderTelegram").value.trim();
       const plan=document.getElementById("orderPlan").value;
@@ -365,61 +499,95 @@
       if(!name){alert("请填写昵称");return}
       if(!telegram){alert("请填写 Telegram 用户名");return}
       if(!amount){alert("请填写付款金额");return}
-      const orders=getOrders();
-      orders.unshift({
-        id:"GMGN-"+Date.now(),
-        name,telegram,plan,amount,txid,note,
-        paymentNetwork:PAYMENT_INFO.network,
-        walletAddress:PAYMENT_INFO.walletAddress,
+
+      const order = {
+        order_id:"GMGN-"+Date.now(),
+        name, telegram, plan, amount, txid, note,
+        payment_network:PAYMENT_INFO.network,
+        wallet_address:PAYMENT_INFO.walletAddress,
         status:"待确认",
-        memberCode:"",
-        time:new Date().toLocaleString()
-      });
-      setOrders(orders);
-      document.getElementById("orderName").value="";
-      document.getElementById("orderTelegram").value="";
-      document.getElementById("orderAmount").value="";
-      document.getElementById("orderTxid").value="";
-      document.getElementById("orderNote").value="";
-      renderOrders();
-      renderAdminOrders();
-      alert("订单已登记。请联系 Telegram 发送付款截图或交易哈希。");
+        member_code:""
+      };
+
+      try {
+        if(isCloudReady()){
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+            method:"POST",
+            headers:supabaseHeaders(),
+            body:JSON.stringify(order)
+          });
+          if(!res.ok) throw new Error(await res.text());
+          alert("订单已提交到云端。请联系 Telegram 发送付款截图或交易哈希。");
+        } else {
+          const orders=getLocalOrders();
+          orders.unshift({...order, created_at:new Date().toLocaleString()});
+          setLocalOrders(orders);
+          alert("订单已保存到本地。配置 Supabase 后可保存到云端。");
+        }
+
+        document.getElementById("orderName").value="";
+        document.getElementById("orderTelegram").value="";
+        document.getElementById("orderAmount").value="";
+        document.getElementById("orderTxid").value="";
+        document.getElementById("orderNote").value="";
+        await loadOrders();
+      } catch(err) {
+        alert("订单提交失败：" + err.message);
+      }
+    }
+
+    async function loadOrders(){
+      try {
+        if(isCloudReady()){
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc`, {
+            headers:supabaseHeaders()
+          });
+          if(!res.ok) throw new Error(await res.text());
+          const data = await res.json();
+          ordersCache = data.map(normalizeOrder);
+        } else {
+          ordersCache = getLocalOrders().map(normalizeOrder);
+        }
+        renderOrders();
+        renderAdminOrders();
+      } catch(err) {
+        alert("读取订单失败：" + err.message);
+      }
     }
 
     function renderOrders(){
       const box=document.getElementById("orderList");
-      const orders=getOrders();
-      if(!orders.length){box.innerHTML='<div class="muted" style="margin-top:10px;">暂无本地订单记录。</div>';return}
+      const orders=ordersCache;
+      if(!orders.length){box.innerHTML='<div class="muted" style="margin-top:10px;">暂无订单记录。</div>';return}
       box.innerHTML=orders.map((o,index)=>`
         <div class="order-item">
           <div><span class="tag ${o.status==='已开通'?'tag-ok':o.status==='已拒绝'?'tag-bad':'tag-b'}">${o.status}</span> <span class="tag">${o.plan}</span></div>
-          <b>订单号：</b>${o.id}<br/>
+          <b>订单号：</b>${o.order_id}<br/>
           <b>昵称：</b>${o.name}<br/>
           <b>Telegram：</b>${o.telegram}<br/>
           <b>金额：</b>${o.amount||"-"} USDT<br/>
           <b>TXID：</b>${o.txid||"未填写"}<br/>
-          <b>付款网络：</b>${o.paymentNetwork||PAYMENT_INFO.network}<br/>
-          <b>时间：</b>${o.time}<br/>
-          <b>会员码：</b>${o.memberCode?'<span class="ok">'+o.memberCode+'</span>':'确认后发放'}<br/>
+          <b>付款网络：</b>${o.payment_network||PAYMENT_INFO.network}<br/>
+          <b>时间：</b>${o.created_at}<br/>
+          <b>会员码：</b>${o.member_code?'<span class="ok">'+o.member_code+'</span>':'确认后发放'}<br/>
           <b>备注：</b>${o.note||"无"}<br/>
           <div class="sell-actions">
-            <button class="secondary" onclick="copyText('${o.id}')">复制订单号</button>
+            <button class="secondary" onclick="copyText('${o.order_id}')">复制订单号</button>
             <button class="secondary" onclick="copyText('${o.telegram}')">复制 Telegram</button>
           </div>
         </div>`).join("");
     }
 
-    function clearOrders(){
-      if(!confirm("确定清空本地订单记录吗？"))return;
-      localStorage.removeItem("gmgn_orders");
-      renderOrders();
-      renderAdminOrders();
-    }
-
     function exportOrders(){
-      const text=JSON.stringify(getOrders(),null,2);
+      const text=JSON.stringify(ordersCache,null,2);
       copyText(text);
       alert("订单记录已复制，可粘贴到备忘录或表格。");
+    }
+
+    function clearLocalOrders(){
+      if(!confirm("确定清空本地订单缓存吗？云端订单不会被删除。"))return;
+      localStorage.removeItem("gmgn_orders");
+      loadOrders();
     }
 
     function adminLogin(){
@@ -471,7 +639,7 @@
 
     function renderAdminOrders(){
       if(!isAdmin)return;
-      const orders=getOrders();
+      const orders=ordersCache;
       const total=orders.length;
       const pending=orders.filter(o=>o.status==="待确认").length;
       const opened=orders.filter(o=>o.status==="已开通").length;
@@ -486,53 +654,64 @@
       box.innerHTML=orders.map((o,index)=>`
         <div class="admin-item">
           <div><span class="tag ${o.status==='已开通'?'tag-ok':o.status==='已拒绝'?'tag-bad':'tag-b'}">${o.status}</span> <span class="tag">${o.plan}</span></div>
-          <b>订单号：</b>${o.id}<br/>
+          <b>订单号：</b>${o.order_id}<br/>
           <b>客户：</b>${o.name} / ${o.telegram}<br/>
           <b>金额：</b>${o.amount||"-"} USDT<br/>
           <b>TXID：</b>${o.txid||"未填写"}<br/>
-          <b>时间：</b>${o.time}<br/>
-          <b>会员码：</b>${o.memberCode||"未发放"}<br/>
+          <b>时间：</b>${o.created_at}<br/>
+          <b>会员码：</b>${o.member_code||"未发放"}<br/>
           <b>备注：</b>${o.note||"无"}<br/>
           <div class="sell-actions">
             <button class="secondary" onclick="copyText('${o.telegram}')">复制客户TG</button>
             <button class="secondary" onclick="assignCode(${index})">分配会员码</button>
             <button class="secondary" onclick="markOrder(${index},'已开通')">标记已开通</button>
             <button class="danger-btn" onclick="markOrder(${index},'已拒绝')">标记拒绝</button>
-            <button class="danger-btn" onclick="deleteOrder(${index})">删除订单</button>
           </div>
         </div>`).join("");
     }
 
-    function assignCode(index){
-      const orders=getOrders();
-      if(!orders[index])return;
-      const used=orders.map(o=>o.memberCode).filter(Boolean);
+    async function updateOrderCloud(order, patch){
+      if(isCloudReady()){
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?order_id=eq.${encodeURIComponent(order.order_id)}`, {
+          method:"PATCH",
+          headers:supabaseHeaders(),
+          body:JSON.stringify(patch)
+        });
+        if(!res.ok) throw new Error(await res.text());
+      } else {
+        const orders=getLocalOrders();
+        const idx=orders.findIndex(o=>(o.order_id||o.id)===order.order_id);
+        if(idx>=0){
+          orders[idx]={...orders[idx],...patch, memberCode:patch.member_code, status:patch.status};
+          setLocalOrders(orders);
+        }
+      }
+    }
+
+    async function assignCode(index){
+      const order=ordersCache[index];
+      if(!order)return;
+      const used=ordersCache.map(o=>o.member_code).filter(Boolean);
       const code=VALID_MEMBER_CODES.find(c=>!used.includes(c)) || VALID_MEMBER_CODES[0];
-      orders[index].memberCode=code;
-      orders[index].status="已开通";
-      setOrders(orders);
-      renderOrders();
-      renderAdminOrders();
-      copyText(code);
-      alert("已分配会员码并复制：" + code);
+      try {
+        await updateOrderCloud(order, {member_code:code,status:"已开通"});
+        await loadOrders();
+        copyText(code);
+        alert("已分配会员码并复制：" + code);
+      } catch(err) {
+        alert("分配失败：" + err.message);
+      }
     }
 
-    function markOrder(index,status){
-      const orders=getOrders();
-      if(!orders[index])return;
-      orders[index].status=status;
-      setOrders(orders);
-      renderOrders();
-      renderAdminOrders();
-    }
-
-    function deleteOrder(index){
-      if(!confirm("确定删除这条订单吗？"))return;
-      const orders=getOrders();
-      orders.splice(index,1);
-      setOrders(orders);
-      renderOrders();
-      renderAdminOrders();
+    async function markOrder(index,status){
+      const order=ordersCache[index];
+      if(!order)return;
+      try {
+        await updateOrderCloud(order, {status});
+        await loadOrders();
+      } catch(err) {
+        alert("更新失败：" + err.message);
+      }
     }
 
     function refreshMemberUI(){
@@ -592,7 +771,7 @@
         const data=await res.json();
         document.getElementById("backendStatus").innerHTML=`
           后端版本：<span class="ok">${data.version||"-"}</span><br/>
-          前端版本：<span class="ok">V1.3.4</span><br/>
+          前端版本：<span class="ok">V1.3.6</span><br/>
           自动提醒：${data.autoAlert?'<span class="ok">已开启</span>':'<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds||"-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize||0} 个`;
@@ -642,7 +821,122 @@
       return allTokens;
     }
 
+
+    function getTokenMetrics(token){
+      const risk = token.risk || {};
+      const signal = token.signal || {};
+      const riskScore = Number(risk.score || 0);
+      const signalScore = Number(signal.score || 0);
+      const liquidity = Number(token.liquidity || 0);
+      const volume24h = Number(token.volume24h || 0);
+      const change1h = Number(token.priceChange1h || 0);
+      const age = Number(token.ageMinutes || 0);
+      const isBlack = !!token.isBlacklisted;
+      const isWhite = !!token.isWhitelisted;
+
+      const passBase = riskScore >= 70 && liquidity >= 300000 && volume24h >= 1000000 && !isBlack;
+      const watch = passBase && signalScore >= 50;
+      const focus = passBase && signalScore >= 70 && change1h >= 0 && change1h <= 30;
+      const finalScore = Math.round(riskScore * 0.45 + signalScore * 0.35 + Math.min(20, liquidity / 500000) + (isWhite ? 8 : 0) - (isBlack ? 50 : 0));
+
+      return {riskScore, signalScore, liquidity, volume24h, change1h, age, isBlack, isWhite, passBase, watch, focus, finalScore};
+    }
+
+    function buildSelectReasons(token){
+      const m = getTokenMetrics(token);
+      const arr = [];
+      if(m.riskScore >= 90) arr.push("✅ 风险评分较高，暂未发现明显高危项");
+      else if(m.riskScore >= 70) arr.push("✅ 风险评分达到基础观察线");
+      if(m.signalScore >= 70) arr.push("✅ 信号评分达到提醒线");
+      if(m.liquidity >= 300000) arr.push("✅ 流动性达到基础门槛：" + money(m.liquidity));
+      if(m.volume24h >= 1000000) arr.push("✅ 24H 交易量活跃：" + money(m.volume24h));
+      if(m.change1h >= 0 && m.change1h <= 30) arr.push("✅ 1H 涨幅在健康观察范围：" + m.change1h.toFixed(2) + "%");
+      if(m.isWhite) arr.push("⭐ 命中白名单地址");
+      if(!arr.length) arr.push("暂无明显入选优势，建议仅观察");
+      return arr.slice(0, 6);
+    }
+
+    function buildFilterReasons(token){
+      const m = getTokenMetrics(token);
+      const arr = [];
+      if(m.isBlack) arr.push("❌ 命中黑名单，优先过滤");
+      if(m.riskScore < 70) arr.push("❌ 风险评分低于基础观察线");
+      if(m.signalScore < 70) arr.push("❌ 信号评分低于提醒线");
+      if(m.liquidity < 300000) arr.push("❌ 流动性不足：" + money(m.liquidity));
+      if(m.volume24h < 1000000) arr.push("❌ 24H 交易量不足：" + money(m.volume24h));
+      if(m.change1h < 0) arr.push("❌ 1H 表现为负：" + m.change1h.toFixed(2) + "%");
+      if(m.change1h > 30) arr.push("❌ 1H 涨幅过热，追高风险较高");
+      if(m.age > 10080) arr.push("❌ 新盘时间过老，不符合当前新币观察范围");
+      if(!arr.length) arr.push("未触发明显过滤项，可继续观察");
+      return arr.slice(0, 6);
+    }
+
+    function renderFunnelAndRanking(){
+      const total = allTokens.length;
+      const metrics = allTokens.map(t => ({token:t, m:getTokenMetrics(t)}));
+      const base = metrics.filter(x => x.m.passBase).length;
+      const watch = metrics.filter(x => x.m.watch).length;
+      const focus = metrics.filter(x => x.m.focus).length;
+      const filtered = Math.max(0, total - base);
+
+      const funnel = document.getElementById("funnelBox");
+      if(funnel){
+        funnel.innerHTML = `
+          <div class="funnel-item"><div class="funnel-num green">${total}</div><div class="funnel-label">原始扫描</div></div>
+          <div class="funnel-item"><div class="funnel-num green">${base}</div><div class="funnel-label">基础通过</div></div>
+          <div class="funnel-item"><div class="funnel-num yellow">${watch}</div><div class="funnel-label">观察候选</div></div>
+          <div class="funnel-item"><div class="funnel-num blue">${focus}</div><div class="funnel-label">重点关注</div></div>
+          <div class="funnel-item"><div class="funnel-num red">${filtered}</div><div class="funnel-label">风险过滤</div></div>
+        `;
+      }
+
+      const rankingBox = document.getElementById("candidateRanking");
+      if(!rankingBox) return;
+
+      const ranked = metrics
+        .filter(x => x.m.watch || x.m.focus)
+        .sort((a,b) => b.m.finalScore - a.m.finalScore)
+        .slice(0, 5);
+
+      if(!ranked.length){
+        rankingBox.innerHTML = '<div class="muted">本次扫描没有进入观察榜的币。说明当前市场候选质量不足，宁可少看，不乱推。</div>';
+        return;
+      }
+
+      rankingBox.innerHTML = ranked.map((x, i) => {
+        const t = x.token;
+        const m = x.m;
+        const symbol = t.symbol || "UNKNOWN";
+        const address = t.address || "";
+        const reasons = buildSelectReasons(t).slice(0, 4).map(r => `<li>${r}</li>`).join("");
+        const level = m.focus ? "重点关注" : "候选观察";
+        const levelClass = m.focus ? "tag-ok" : "tag-b";
+        return `
+          <div class="rank-card">
+            <div><span class="rank-no">${i+1}</span><b>${symbol}</b> <span class="tag ${levelClass}">${level}</span></div>
+            <div class="muted" style="margin-top:8px;">
+              综合分：<span class="ok">${m.finalScore}</span>｜
+              风险：${m.riskScore}｜
+              信号：${m.signalScore}<br/>
+              流动性：${money(m.liquidity)}｜
+              24H量：${money(m.volume24h)}｜
+              1H：${m.change1h.toFixed(2)}%
+            </div>
+            <ul class="reason-list">${reasons}</ul>
+            <div class="actions">
+              ${address?`<button class="mini-btn" onclick="copyText('${address}')">复制合约</button>`:""}
+              ${t.gmgnUrl?`<a class="mini-btn" href="${t.gmgnUrl}" target="_blank">打开 GMGN</a>`:""}
+              ${t.dexUrl?`<a class="mini-btn" href="${t.dexUrl}" target="_blank">打开 Dex</a>`:""}
+              <a class="mini-btn" href="${xSearchUrl(symbol,address,'live')}" target="_blank">X 最新</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+
     function render(){
+      renderFunnelAndRanking();
       const cards=document.getElementById("cards");
       const list=filteredTokens();
       if(!list.length){cards.innerHTML='<div class="status">当前筛选条件下没有数据。</div>';return}
@@ -683,6 +977,8 @@
               买税/卖税：${Number(token.buyTax||0).toFixed(2)}% / ${Number(token.sellTax||0).toFixed(2)}%<br/>
               新盘时间：${Number(token.ageMinutes||0)} 分钟
             </div>
+            <div class="signal-box"><b>为什么值得看</b><ul class="reason-list">${buildSelectReasons(token).map(r=>`<li>${r}</li>`).join("")}</ul></div>
+            <div class="signal-box"><b>为什么可能被过滤</b><ul class="reason-list">${buildFilterReasons(token).map(r=>`<li>${r}</li>`).join("")}</ul></div>
             <div class="reason">风险原因：${risk.reasons&&risk.reasons.length?risk.reasons.join("、"):"暂未发现明显高危项"}</div>
             <div class="advice">AI建议：${signal.advice||risk.advice||"仅供观察"}</div>
             <div class="actions">
@@ -693,6 +989,7 @@
               <a class="mini-btn" href="${xSearchUrl(symbol,address,'cash')}" target="_blank">搜索 $${symbol}</a>
               <a class="mini-btn" href="${xSearchUrl(symbol,address,'hot')}" target="_blank">X 热门</a>
               ${address?`<a class="mini-btn" href="${xSearchUrl(symbol,address,'address')}" target="_blank">X 搜合约</a>`:""}
+              <button class="mini-btn" onclick="copyProfessionalText('${symbol}', '${address}')">复制专业提醒文案</button>
             </div>
           </div>`;
       }).join("");
@@ -739,6 +1036,43 @@
           </div>`;
       }).join("");
     }
+
+
+    function copyProfessionalText(symbol, address){
+      const token = allTokens.find(t => (t.symbol||"") === symbol && (t.address||"") === address) || allTokens.find(t => (t.symbol||"") === symbol);
+      if(!token){ alert("未找到币种数据"); return; }
+      const m = getTokenMetrics(token);
+      const selectReasons = buildSelectReasons(token).join("\n");
+      const filterReasons = buildFilterReasons(token).join("\n");
+      const text = `🟢 GMGN AI Trader 专业筛选提醒
+
+币种：${token.symbol || "-"}
+名称：${token.name || "-"}
+链：${token.chain || "-"}
+综合分：${m.finalScore}/100
+风险评分：${m.riskScore}/100
+信号评分：${m.signalScore}/100
+
+为什么进入观察：
+${selectReasons}
+
+需要注意：
+${filterReasons}
+
+核心数据：
+价格：${price(token.price)}
+流动性：${money(token.liquidity)}
+24H交易量：${money(token.volume24h)}
+1H涨幅：${m.change1h.toFixed(2)}%
+新盘时间：${m.age} 分钟
+
+合约地址：
+${token.address || "-"}
+
+提醒：这不是投资建议，不要重仓跟买。Meme 币波动极大，可能归零。`;
+      copyText(text);
+    }
+
 
     async function scan(){
       if(!requireMember())return;
@@ -805,11 +1139,12 @@
       alert("已开启自动刷新：每30秒刷新一次");
     }
 
-    document.addEventListener("DOMContentLoaded",function(){
+    document.addEventListener("DOMContentLoaded",async function(){
+      updateCloudStatus();
       refreshMemberUI();
       refreshAdminUI();
       loadConfig();
-      renderOrders();
+      await loadOrders();
       if(isMember)scan();
     });
   </script>
