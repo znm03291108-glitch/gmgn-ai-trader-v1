@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.3.0 支付订单版</title>
+  <title>GMGN AI Trader V1.3.1 支付增强版</title>
   <style>
     body {
       margin: 0;
@@ -143,12 +143,6 @@
 
     button.danger-btn {
       background: #8b2f2f;
-    }
-
-    button.gold-btn {
-      background: rgba(255, 173, 51, 0.16);
-      border: 1px solid rgba(255, 173, 51, 0.45);
-      color: #ffd38a;
     }
 
     .chip {
@@ -473,22 +467,15 @@
       margin: 8px 0;
     }
 
-    .fake-qr {
-      width: 160px;
-      height: 160px;
+    .qr-img {
+      width: 220px;
+      height: 220px;
       border-radius: 14px;
-      background:
-        linear-gradient(90deg, #0b1220 10px, transparent 10px) 0 0 / 20px 20px,
-        linear-gradient(#0b1220 10px, transparent 10px) 0 0 / 20px 20px,
-        #f4f7fb;
-      border: 8px solid #fff;
-      display: grid;
-      place-items: center;
-      color: #0b1220;
-      font-weight: bold;
-      text-align: center;
-      font-size: 13px;
+      background: #fff;
+      padding: 10px;
+      display: block;
       margin: 10px 0;
+      box-sizing: border-box;
     }
 
     .order-item {
@@ -515,8 +502,8 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.3.0 支付订单版</h1>
-      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记。当前版本只做数据观察，不连接钱包，不自动买入。</p>
+      <h1>GMGN AI Trader V1.3.1 支付增强版</h1>
+      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记 + USDT 收款二维码。</p>
 
       <div class="sell-actions">
         <a class="sell-btn primary" href="#pricing">查看价格</a>
@@ -589,28 +576,33 @@
         <div class="pay-box">
           <h3>USDT 付款</h3>
           <div class="muted">
-            付款前建议先联系 Telegram 确认套餐和付款网络。付款后填写下方订单登记表。
+            付款前请确认套餐和付款网络。付款后填写下方订单登记表，并联系 Telegram 发送付款截图或交易哈希。
           </div>
 
           <div class="pay-address" id="usdtAddress">
-            请联系 Telegram 获取最新 USDT 收款地址。<br/>
-            Telegram：@zleisheng
+            正在加载钱包地址...
+          </div>
+
+          <div class="muted" id="paymentNetwork">
+            正在加载付款网络...
           </div>
 
           <div class="sell-actions">
-            <button class="secondary" onclick="copyText('https://t.me/zleisheng')">复制 Telegram 联系方式</button>
+            <button class="secondary" onclick="copyText(PAYMENT_INFO.walletAddress)">复制钱包地址</button>
+            <button class="secondary" onclick="copyText('https://t.me/zleisheng')">复制 Telegram</button>
             <a class="sell-btn gold" href="https://t.me/zleisheng" target="_blank">打开 Telegram</a>
+          </div>
+
+          <div class="warning">
+            请务必使用 BEP20 / BSC 网络转 USDT。转错网络或转错地址无法找回。
           </div>
         </div>
 
         <div class="pay-box">
           <h3>二维码支付</h3>
-          <div class="fake-qr">
-            支付二维码<br/>
-            可后续替换
-          </div>
+          <img id="paymentQr" class="qr-img" src="" alt="USDT 收款二维码" />
           <div class="muted">
-            这里先放占位二维码。你后面可以把它替换成微信、支付宝或 USDT 收款二维码图片。
+            扫码会显示收款地址。若二维码无法识别，也可以直接复制左侧钱包地址付款。
           </div>
         </div>
 
@@ -618,10 +610,11 @@
           <h3>付款后流程</h3>
           <div class="muted">
             1. 选择套餐<br/>
-            2. 联系 Telegram 确认付款方式<br/>
-            3. 付款后登记订单<br/>
-            4. 人工确认后发送会员码<br/>
-            5. 输入会员码进入控制台
+            2. 使用 BEP20 / BSC 网络转 USDT<br/>
+            3. 填写下方订单登记<br/>
+            4. 联系 Telegram 发送付款截图或交易哈希<br/>
+            5. 人工确认后发送会员码<br/>
+            6. 输入会员码进入控制台
           </div>
           <div class="success">
             通常付款确认后 5-10 分钟内发放会员码。
@@ -642,7 +635,7 @@
           <option value="部署版 $29">部署版 $29</option>
           <option value="定制版 $99+">定制版 $99+</option>
         </select>
-        <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT，交易哈希 / 时间 / 备注"></textarea>
+        <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT-BEP20，交易哈希 / 时间 / 备注"></textarea>
 
         <div class="sell-actions">
           <button onclick="saveOrder()">提交订单登记</button>
@@ -746,12 +739,18 @@
     </div>
 
     <div class="footer">
-      当前版本：V1.3.0 支付二维码 + 订单记录版。后续可升级：后端真实会员验证、支付二维码图片、Supabase 云端订单、会员码生成器、Telegram 自动发会员码。
+      当前版本：V1.3.1 支付增强版。后续可升级：Supabase 云端订单、会员码生成器、Telegram 自动发会员码、真实 X 热度评分。
     </div>
   </div>
 
   <script>
     const API_BASE = "https://gmgn-ai-trader-v1-production-77e2.up.railway.app";
+
+    const PAYMENT_INFO = {
+      network: "BEP20 / BSC",
+      walletAddress: "0xBf7ad8f3FD67F2fb70BE75DC5e49Eeb36a821622",
+      telegram: "@zleisheng"
+    };
 
     const VALID_MEMBER_CODES = [
       "VIP2026",
@@ -767,6 +766,30 @@
     let timer = null;
     let config = null;
     let isMember = localStorage.getItem("gmgn_member_ok") === "true";
+
+    function initPaymentInfo() {
+      const addressBox = document.getElementById("usdtAddress");
+      const qrImg = document.getElementById("paymentQr");
+      const networkText = document.getElementById("paymentNetwork");
+
+      if (addressBox) {
+        addressBox.innerHTML = `
+          收款网络：<b>${PAYMENT_INFO.network}</b><br/>
+          收款币种：<b>USDT</b><br/>
+          钱包地址：<br/>
+          ${PAYMENT_INFO.walletAddress}
+        `;
+      }
+
+      if (networkText) {
+        networkText.innerHTML = `请使用 <b>${PAYMENT_INFO.network}</b> 网络付款，币种为 <b>USDT</b>。`;
+      }
+
+      if (qrImg) {
+        const qrText = PAYMENT_INFO.walletAddress;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrText)}`;
+      }
+    }
 
     function money(v) {
       const n = Number(v || 0);
@@ -884,6 +907,8 @@
         telegram,
         plan,
         note,
+        paymentNetwork: PAYMENT_INFO.network,
+        walletAddress: PAYMENT_INFO.walletAddress,
         status: "待确认",
         time: new Date().toLocaleString()
       };
@@ -914,6 +939,8 @@
           <b>订单号：</b>${o.id}<br/>
           <b>昵称：</b>${o.name}<br/>
           <b>Telegram：</b>${o.telegram}<br/>
+          <b>付款网络：</b>${o.paymentNetwork || PAYMENT_INFO.network}<br/>
+          <b>收款地址：</b>${o.walletAddress || PAYMENT_INFO.walletAddress}<br/>
           <b>时间：</b>${o.time}<br/>
           <b>备注：</b>${o.note || "无"}<br/>
           <div class="sell-actions">
@@ -1020,7 +1047,7 @@
 
         document.getElementById("backendStatus").innerHTML = `
           后端版本：<span class="ok">${data.version || "-"}</span><br/>
-          前端版本：<span class="ok">V1.3.0</span><br/>
+          前端版本：<span class="ok">V1.3.1</span><br/>
           自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize || 0} 个
@@ -1083,29 +1110,4 @@
       const list = filteredTokens();
 
       if (!list.length) {
-        cards.innerHTML = `<div class="status">当前筛选条件下没有数据。</div>`;
-        return;
-      }
-
-      cards.innerHTML = list.map(token => {
-        const risk = token.risk || {};
-        const signal = token.signal || {};
-        const riskScore = Number(risk.score || 0);
-        const signalScore = Number(signal.score || 0);
-
-        const riskClass = riskScore >= 75 ? "green" : riskScore < 50 ? "red" : "yellow";
-        const sigClass = signalColor(signalScore);
-
-        const whiteTag = token.isWhitelisted ? `<span class="tag tag-white">⭐ 白名单</span>` : "";
-        const blackTag = token.isBlacklisted ? `<span class="tag tag-black">⛔ 黑名单</span>` : "";
-        const gradeTag = `<span class="tag ${gradeClass(signal.grade)}">${signal.grade || "C"}级 - ${signal.label || "过滤"}</span>`;
-
-        const symbol = token.symbol || "UNKNOWN";
-        const address = token.address || "";
-
-        return `
-          <div class="card">
-            <div class="top">
-              <div>
-                <div class="symbol">${symbol}</div>
-                <di
+        cards.innerHTML = `<div
