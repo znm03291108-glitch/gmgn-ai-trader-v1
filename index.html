@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.3.3 高清内置二维码版</title>
+  <title>GMGN AI Trader V1.3.4 订单管理会员码版</title>
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#070b12;color:#f4f7fb;font-family:Arial,"Microsoft YaHei",sans-serif}
@@ -11,7 +11,7 @@
     .hero,.panel,.card{background:#111827;border:1px solid #26344d;border-radius:18px;padding:16px;margin-bottom:14px}
     .hero{background:linear-gradient(135deg,#101827,#172033)}
     h1,h2,h3{margin-top:0}
-    .hero h1{font-size:24px;line-height:1.35}
+    .hero h1{font-size:25px;line-height:1.35}
     .hero p,.status,.meta,.status-line,.muted{color:#aebbd0;line-height:1.7;font-size:14px}
     .warning{background:rgba(255,173,51,.12);border:1px solid rgba(255,173,51,.4);border-radius:14px;padding:12px;color:#ffd38a;line-height:1.6;font-size:14px;margin-top:12px}
     .success{background:rgba(129,240,164,.12);border:1px solid rgba(129,240,164,.4);border-radius:14px;padding:12px;color:#81f0a4;line-height:1.6;font-size:14px;margin-top:12px}
@@ -25,6 +25,7 @@
     button{background:#2f7cff;color:white;font-weight:bold;cursor:pointer}
     button.secondary{background:#172033;border:1px solid #2b3a52;color:#dce8ff}
     button.danger-btn{background:#8b2f2f}
+    button.gold-btn{background:rgba(255,173,51,.16);border:1px solid rgba(255,173,51,.5);color:#ffd38a}
     .chip{border-radius:999px;padding:8px 12px;background:#111827;border:1px solid #2b3a52;color:#dce8ff;font-size:13px;cursor:pointer}
     .chip.active{background:#2f7cff;border-color:#2f7cff;color:white}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
@@ -57,32 +58,43 @@
     .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-top:10px}
     .summary-item{background:#0b1220;border:1px solid #26344d;border-radius:14px;padding:10px}
     .summary-num{font-size:24px;font-weight:bold;margin-bottom:4px}
-    .price-card{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:14px}
+    .price-card,.step-card{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:14px}
     .price{font-size:28px;font-weight:bold;color:#81f0a4;margin:8px 0}
     .locked{filter:blur(2px);pointer-events:none;user-select:none;opacity:.38}
     .login-box{background:#0b1220;border:1px solid #26344d;border-radius:16px;padding:14px;margin-top:12px}
     .member-badge{display:inline-block;border-radius:999px;padding:6px 10px;background:rgba(129,240,164,.12);color:#81f0a4;border:1px solid rgba(129,240,164,.4);font-size:13px;margin-bottom:10px}
-    .hidden{display:none}
+    .hidden{display:none!important}
     .pay-box{background:#0b1220;border:1px dashed #36506f;border-radius:16px;padding:14px;margin-top:10px}
     .pay-address{background:#070b12;border:1px solid #26344d;border-radius:12px;padding:12px;word-break:break-all;color:#d9e2f1;font-size:14px;line-height:1.7;margin:8px 0}
     .wallet-text{color:#81f0a4;font-weight:bold;word-break:break-all}
-    .qr-img{width:220px;height:220px;border-radius:14px;background:#fff;padding:10px;display:block;margin:10px 0}
-    .qr-fallback{width:220px;min-height:220px;border-radius:14px;background:#fff;color:#111827;padding:14px;display:none;margin:10px 0;word-break:break-all;font-size:13px;line-height:1.6}
-    .order-item{background:#0b1220;border:1px solid #26344d;border-radius:14px;padding:12px;margin-top:10px;color:#d9e2f1;font-size:13px;line-height:1.7;word-break:break-word}
+    .qr-img{width:260px;height:260px;border-radius:16px;background:#fff;padding:12px;display:block;margin:10px 0}
+    .order-item,.admin-item,.code-item{background:#0b1220;border:1px solid #26344d;border-radius:14px;padding:12px;margin-top:10px;color:#d9e2f1;font-size:13px;line-height:1.7;word-break:break-word}
+    .admin-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
     .footer{margin-top:20px;color:#8190a8;font-size:13px;line-height:1.6}
   </style>
 </head>
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.3.3 高清内置二维码版</h1>
-      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记 + USDT 收款二维码。</p>
+      <h1>GMGN AI Trader V1.3.4 订单管理 + 会员码发放版</h1>
+      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记 + 管理员发码。</p>
       <div class="sell-actions">
         <a class="sell-btn primary" href="#pricing">查看价格</a>
         <a class="sell-btn gold" href="#payment">支付方式</a>
+        <a class="sell-btn" href="#order">订单登记</a>
         <a class="sell-btn" href="#member">会员登录</a>
       </div>
       <div class="warning">风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。</div>
+    </div>
+
+    <div class="panel">
+      <h2>购买流程</h2>
+      <div class="grid">
+        <div class="step-card"><h3>1. 选择套餐</h3><div class="muted">体验版、部署版、定制版，根据使用需求选择。</div></div>
+        <div class="step-card"><h3>2. USDT 付款</h3><div class="muted">使用 BEP20 / BSC 网络转 USDT 到页面钱包地址。</div></div>
+        <div class="step-card"><h3>3. 填写订单</h3><div class="muted">填写 Telegram、套餐、金额、TXID，方便核对。</div></div>
+        <div class="step-card"><h3>4. 联系客服</h3><div class="muted">发送付款截图或交易哈希，人工确认后发会员码。</div></div>
+      </div>
     </div>
 
     <div class="panel">
@@ -97,9 +109,9 @@
     <div class="panel" id="pricing">
       <h2>价格套餐</h2>
       <div class="grid">
-        <div class="price-card"><h3>体验版</h3><div class="price">$9</div><div class="muted">适合：想先试用工具、看看扫描、评分、X 搜索入口和 Telegram 提醒效果的人。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('体验版 $9')">立即购买体验版</a></div></div>
-        <div class="price-card"><h3>部署版</h3><div class="price">$29</div><div class="muted">适合：想拥有自己独立网页和 Telegram 机器人的人。提供 GitHub Pages、Railway、Telegram 配置流程。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('部署版 $29')">购买部署版</a></div></div>
-        <div class="price-card"><h3>定制版</h3><div class="price">$99+</div><div class="muted">适合：群主、KOL、项目方、想做自己品牌雷达系统的人。可定制链、提醒规则、黑名单、页面品牌。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('定制版 $99+')">联系定制</a></div></div>
+        <div class="price-card"><h3>体验版</h3><div class="price">$9</div><div class="muted">适合：想先试用工具、看看扫描、评分、X 搜索入口和 Telegram 提醒效果的人。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('体验版 $9','9')">立即购买体验版</a></div></div>
+        <div class="price-card"><h3>部署版</h3><div class="price">$29</div><div class="muted">适合：想拥有自己独立网页和 Telegram 机器人的人。提供 GitHub Pages、Railway、Telegram 配置流程。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('部署版 $29','29')">购买部署版</a></div></div>
+        <div class="price-card"><h3>定制版</h3><div class="price">$99+</div><div class="muted">适合：群主、KOL、项目方、想做自己品牌雷达系统的人。可定制链、提醒规则、黑名单、页面品牌。</div><div class="sell-actions"><a class="sell-btn primary" href="#payment" onclick="selectPlan('定制版 $99+','99')">联系定制</a></div></div>
       </div>
       <div class="warning">说明：本工具不保证收益，不提供买卖建议，不代客交易，不自动买入。它只是帮助用户更快观察数据和风险。</div>
     </div>
@@ -128,12 +140,7 @@
 
         <div class="pay-box">
           <h3>二维码支付</h3>
-          <img id="paymentQr" class="qr-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhwAAAIcCAIAAAAynOArAAALzElEQVR4nO3cQW7jSBBFwdHA97+yZ+8BjEL3QyqLijiARZGUH2rzX9/f3/8AQOHfd18AAM8hKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyHy9+wJ+er1e776Et/n+/k7+zsk9PPmsbc9i8v6cmLyHN74b1TWf2PauTpq8zyecVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs27768S2rZsT27aJtu1fbdu2qmzbK6vc+Bu88Zq3PfcTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkLly++vE5GbOjZtC2zapqs2ubRtiN243bfvuk78v/zf+npMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGQeu/31yZ66y1Sptq2A/3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCM7a/LVLtV1bZVdT2TW2ST333SjXtlN14zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMY7e/nroptG23anLX60S1RTZp2w5bpXo3tl0zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMldtfk1tS20xuJU1uN03+nROffD03bnad+OT/G5OcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs277a9teEL/bthO17e+cuPH+bPPU73UjJxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyKzb/qqc7CmdqDaFquv55M86se25T37W5Hef3CKb/F6TO2xP5aQCQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKAJnHbn9Nbgqd2LZxdKLaQaq+1ydvQE1ez7b3cPKzJt+Nbe9YxUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJXbn9t20HatjN24qnXM7kBVfE+/27bs5j8OzdyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzJXbX5NbQNUO0uR204nqe914PZPvz6TJXa+n/i5ObNtG28ZJBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyrxt3kLbtO23bv5p0430+Mfksbty/mrRtZ+zEtnd1kpMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGTWbX9t2y+68f5s26166mdNmnzuN97nG7e2tu2VVZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4L+Gnb1s1Tt5ImPXUrafKZTr5jlW3PffL92fYsJjmpAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBm3fbX5J7S5BbQjdtNJ7btcZ3Ydp+3vYcVe3efyUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKvGzdqJreSqs/atjc1eX9utG0jyzu257MqN/7vPeGkAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZr3dfwE92fn43ec2Tm1TbtrYm/87kd598D7f9lk8+a3Jj7cb354STCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBk1m1/nZjcFNq22TW5TTS56/XUHaRt13PjRlb1Wbb+ZjipAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkDmyu0vm1R73PgsJk1+9xvfsRu/1yfvep1wUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzGvbrs7k1taN2zvbtrYmd5Ce+q6emPzu236DN25tffLvwkkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJf776Ad5rcB9v2WZVqm+jGrbbJa75xt6oyuX91429nGycVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMhcuf1VbS5N7gVNbjfduBNVPa9t+2CVyft84wbdicl7+MmcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2z3PiqdtEn7x/Nfkstt3nyS27bb8d32vm70xyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzNe7L+Cnya2bp2433bgpNHk9k99r2y7Ttme6zbbfxY2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg87Jj87ttW2Tbtpu27bDxu23Pa9tv58Y9wG2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg8/XuC/gTk/s827aSqs+6cVPoxmt+6kbWiU++5k/mpAJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAmXXbX9t2qya3m7btRFXXXG2sTe6nTZq8z5Ubr3mbp353JxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyLyeuj9z42bXiW2bS5+871R99xvfn22fNWnbPdzGSQWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMo/d/nqqbbtelRs3zSo3XvOJbc/0xLbruZGTCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkvt59AT9t2y+atG1T6MZNqsntpmrbqro/296fSdt24ap348S25+6kAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZddtfJ7Zt3ZyY3Pl56jbR5HPftg+27Xlt2+i78X/Cjff5hJMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGSu3P46MbmZs213aNtu1Ymn7l9Vz2LbZ52o7uG2/avJd2Pb/5YTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkHlt25bZtgF1YnILaHID6qkmt634e57XXZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4LoHfjVtLkVtuJ6rt/8ubbtmue/F3c+BusOKkAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQOa1bVtm215QZfJ7bdvROvHU/asTNz6vEzc+i8pT39UTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkPl69wX8iaduJVW27WhVz6v6XtVnnajus3f+723b49r2rlacVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2GwPAvZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMv8BYvbiGAYSLswAAAAASUVORK5CYII=" alt="USDT BEP20 BSC 收款地址二维码" />
-          <div id="qrFallback" class="qr-fallback">
-            二维码接口无法加载。<br/>
-            请复制钱包地址付款：<br/>
-            0xBf7ad8f3FD67F2fb70BE75DC5e49Eeb36a821622
-          </div>
+          <img id="paymentQr" class="qr-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhwAAAIcCAIAAAAynOArAAALzElEQVR4nO3cQW7jSBBFwdHA97+yZ+8BjEL3QyqLijiARZGUH2rzX9/f3/8AQOHfd18AAM8hKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyHy9+wJ+er1e776Et/n+/k7+zsk9PPmsbc9i8v6cmLyHN74b1TWf2PauTpq8zyecVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs27768S2rZsT27aJtu1fbdu2qmzbK6vc+Bu88Zq3PfcTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkLly++vE5GbOjZtC2zapqs2ubRtiN243bfvuk78v/zf+npMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGQeu/31yZ66y1Sptq2A/3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCM7a/LVLtV1bZVdT2TW2ST333SjXtlN14zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMY7e/nroptG23anLX60S1RTZp2w5bpXo3tl0zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMldtfk1tS20xuJU1uN03+nROffD03bnad+OT/G5OcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs277a9teEL/bthO17e+cuPH+bPPU73UjJxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyKzb/qqc7CmdqDaFquv55M86se25T37W5Hef3CKb/F6TO2xP5aQCQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKAJnHbn9Nbgqd2LZxdKLaQaq+1ydvQE1ez7b3cPKzJt+Nbe9YxUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJXbn9t20HatjN24qnXM7kBVfE+/27bs5j8OzdyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzJXbX5NbQNUO0uR204nqe914PZPvz6TJXa+n/i5ObNtG28ZJBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyrxt3kLbtO23bv5p0430+Mfksbty/mrRtZ+zEtnd1kpMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGTWbX9t2y+68f5s26166mdNmnzuN97nG7e2tu2VVZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4L+Gnb1s1Tt5ImPXUrafKZTr5jlW3PffL92fYsJjmpAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBm3fbX5J7S5BbQjdtNJ7btcZ3Ydp+3vYcVe3efyUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKvGzdqJreSqs/atjc1eX9utG0jyzu257MqN/7vPeGkAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZr3dfwE92fn43ec2Tm1TbtrYm/87kd598D7f9lk8+a3Jj7cb354STCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBk1m1/nZjcFNq22TW5TTS56/XUHaRt13PjRlb1Wbb+ZjipAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkDmyu0vm1R73PgsJk1+9xvfsRu/1yfvep1wUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzGvbrs7k1taN2zvbtrYmd5Ce+q6emPzu236DN25tffLvwkkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJf776Ad5rcB9v2WZVqm+jGrbbJa75xt6oyuX91429nGycVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMhcuf1VbS5N7gVNbjfduBNVPa9t+2CVyft84wbdicl7+MmcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2z3PiqdtEn7x/Nfkstt3nyS27bb8d32vm70xyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzNe7L+Cnya2bp2433bgpNHk9k99r2y7Ttme6zbbfxY2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg87Jj87ttW2Tbtpu27bDxu23Pa9tv58Y9wG2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg8/XuC/gTk/s827aSqs+6cVPoxmt+6kbWiU++5k/mpAJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAmXXbX9t2qya3m7btRFXXXG2sTe6nTZq8z5Ubr3mbp353JxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyLyeuj9z42bXiW2bS5+871R99xvfn22fNWnbPdzGSQWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMo/d/nqqbbtelRs3zSo3XvOJbc/0xLbruZGTCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkvt59AT9t2y+atG1T6MZNqsntpmrbqro/296fSdt24ap348S25+6kAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZddtfJ7Zt3ZyY3Pl56jbR5HPftg+27Xlt2+i78X/Cjff5hJMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGSu3P46MbmZs213aNtu1Ymn7l9Vz2LbZ52o7uG2/avJd2Pb/5YTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkHlt25bZtgF1YnILaHID6qkmt634e57XXZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4LoHfjVtLkVtuJ6rt/8ubbtmue/F3c+BusOKkAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQOa1bVtm215QZfJ7bdvROvHU/asTNz6vEzc+i8pT39UTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkPl69wX8iaduJVW27WhVz6v6XtVnnajus3f+723b49r2rlacVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2GwPAvZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMv8BYvbiGAYSLswAAAAASUVORK5CYII=" alt="USDT BEP20 BSC 收款二维码" />
           <div class="muted">这是高清内置二维码，不依赖外部接口。扫码应显示钱包地址；若钱包 App 不识别，请直接复制左侧钱包地址付款。</div>
         </div>
 
@@ -156,7 +163,9 @@
           <option value="部署版 $29">部署版 $29</option>
           <option value="定制版 $99+">定制版 $99+</option>
         </select>
-        <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT-BEP20，交易哈希 / 时间 / 备注"></textarea>
+        <input id="orderAmount" placeholder="付款金额，例如 9 / 29 / 99" />
+        <input id="orderTxid" placeholder="交易哈希 TXID，可先复制粘贴这里" />
+        <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT-BEP20，付款时间，备注"></textarea>
         <div class="sell-actions">
           <button onclick="saveOrder()">提交订单登记</button>
           <button class="secondary" onclick="exportOrders()">导出订单记录</button>
@@ -164,6 +173,42 @@
         </div>
       </div>
       <div id="orderList"></div>
+    </div>
+
+    <div class="panel" id="admin">
+      <h2>管理员订单管理</h2>
+      <div id="adminLoginBox" class="login-box">
+        <div class="muted">管理员输入密码后，可以查看订单、标记状态、复制会员码。</div>
+        <input id="adminPass" placeholder="请输入管理员密码" type="password" />
+        <button onclick="adminLogin()">进入管理员区</button>
+      </div>
+
+      <div id="adminBox" class="hidden">
+        <div class="success">
+          <span class="member-badge">管理员已登录</span><br/>
+          可以处理订单和发放会员码。
+        </div>
+
+        <div class="admin-bar">
+          <div class="summary-item"><div class="summary-num green" id="adminTotal">0</div><div class="status-line">订单总数</div></div>
+          <div class="summary-item"><div class="summary-num yellow" id="adminPending">0</div><div class="status-line">待确认</div></div>
+          <div class="summary-item"><div class="summary-num green" id="adminOpened">0</div><div class="status-line">已开通</div></div>
+          <div class="summary-item"><div class="summary-num red" id="adminRejected">0</div><div class="status-line">已拒绝</div></div>
+        </div>
+
+        <div class="sell-actions">
+          <button class="secondary" onclick="renderAdminOrders()">刷新订单</button>
+          <button class="secondary" onclick="exportOrders()">导出订单</button>
+          <button class="gold-btn" onclick="copyAllMemberCodes()">复制全部会员码</button>
+          <button class="danger-btn" onclick="adminLogout()">退出管理员</button>
+        </div>
+
+        <h3>会员码发放区</h3>
+        <div id="memberCodeList"></div>
+
+        <h3>订单列表</h3>
+        <div id="adminOrderList"></div>
+      </div>
     </div>
 
     <div class="panel" id="member">
@@ -223,7 +268,7 @@
       <div id="cards" class="cards"></div>
     </div>
 
-    <div class="footer">当前版本：V1.3.3 高清内置二维码版。后续可升级：云端订单、会员码生成器、Telegram 自动发会员码、真实 X 热度评分。</div>
+    <div class="footer">当前版本：V1.3.4 订单管理 + 会员码发放版。说明：订单和管理员状态保存在本机浏览器，适合第一版售卖测试。</div>
   </div>
 
   <script>
@@ -233,21 +278,13 @@
       walletAddress: "0xBf7ad8f3FD67F2fb70BE75DC5e49Eeb36a821622",
       telegram: "@zleisheng"
     };
-    const VALID_MEMBER_CODES = ["VIP2026","GMGN999","MEME888","RADAR666","BOSS520","TEST123"];
+    const ADMIN_PASSWORD = "GMGN134";
+    const VALID_MEMBER_CODES = ["VIP2026","GMGN999","MEME888","RADAR666","BOSS520","TEST123","VIP888","GMGN134","MEME2026","TRADER999"];
     let allTokens = [];
     let currentFilter = "all";
     let timer = null;
     let isMember = localStorage.getItem("gmgn_member_ok") === "true";
-
-    function initQrCode(){
-      const qrImg=document.getElementById("paymentQr");
-      const qrFallback=document.getElementById("qrFallback");
-      if(qrImg){
-        qrImg.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhwAAAIcCAIAAAAynOArAAALzElEQVR4nO3cQW7jSBBFwdHA97+yZ+8BjEL3QyqLijiARZGUH2rzX9/f3/8AQOHfd18AAM8hKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyHy9+wJ+er1e776Et/n+/k7+zsk9PPmsbc9i8v6cmLyHN74b1TWf2PauTpq8zyecVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs27768S2rZsT27aJtu1fbdu2qmzbK6vc+Bu88Zq3PfcTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkLly++vE5GbOjZtC2zapqs2ubRtiN243bfvuk78v/zf+npMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGQeu/31yZ66y1Sptq2A/3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCM7a/LVLtV1bZVdT2TW2ST333SjXtlN14zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMY7e/nroptG23anLX60S1RTZp2w5bpXo3tl0zv3NSASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYDMldtfk1tS20xuJU1uN03+nROffD03bnad+OT/G5OcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgs277a9teEL/bthO17e+cuPH+bPPU73UjJxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyKzb/qqc7CmdqDaFquv55M86se25T37W5Hef3CKb/F6TO2xP5aQCQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKAJnHbn9Nbgqd2LZxdKLaQaq+1ydvQE1ez7b3cPKzJt+Nbe9YxUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJXbn9t20HatjN24qnXM7kBVfE+/27bs5j8OzdyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzJXbX5NbQNUO0uR204nqe914PZPvz6TJXa+n/i5ObNtG28ZJBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyrxt3kLbtO23bv5p0430+Mfksbty/mrRtZ+zEtnd1kpMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGTWbX9t2y+68f5s26166mdNmnzuN97nG7e2tu2VVZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4L+Gnb1s1Tt5ImPXUrafKZTr5jlW3PffL92fYsJjmpAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBm3fbX5J7S5BbQjdtNJ7btcZ3Ydp+3vYcVe3efyUkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKvGzdqJreSqs/atjc1eX9utG0jyzu257MqN/7vPeGkAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZr3dfwE92fn43ec2Tm1TbtrYm/87kd598D7f9lk8+a3Jj7cb354STCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBk1m1/nZjcFNq22TW5TTS56/XUHaRt13PjRlb1Wbb+ZjipAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkDmyu0vm1R73PgsJk1+9xvfsRu/1yfvep1wUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzGvbrs7k1taN2zvbtrYmd5Ce+q6emPzu236DN25tffLvwkkFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADJf776Ad5rcB9v2WZVqm+jGrbbJa75xt6oyuX91429nGycVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMhcuf1VbS5N7gVNbjfduBNVPa9t+2CVyft84wbdicl7+MmcVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2z3PiqdtEn7x/Nfkstt3nyS27bb8d32vm70xyUgEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAzNe7L+Cnya2bp2433bgpNHk9k99r2y7Ttme6zbbfxY2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg87Jj87ttW2Tbtpu27bDxu23Pa9tv58Y9wG2cVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg8/XuC/gTk/s827aSqs+6cVPoxmt+6kbWiU++5k/mpAJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAmXXbX9t2qya3m7btRFXXXG2sTe6nTZq8z5Ubr3mbp353JxUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyLyeuj9z42bXiW2bS5+871R99xvfn22fNWnbPdzGSQWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMo/d/nqqbbtelRs3zSo3XvOJbc/0xLbruZGTCgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkvt59AT9t2y+atG1T6MZNqsntpmrbqro/296fSdt24ap348S25+6kAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgCZddtfJ7Zt3ZyY3Pl56jbR5HPftg+27Xlt2+i78X/Cjff5hJMKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGSu3P46MbmZs213aNtu1Ymn7l9Vz2LbZ52o7uG2/avJd2Pb/5YTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkHlt25bZtgF1YnILaHID6qkmt634e57XXZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASDz9e4LoHfjVtLkVtuJ6rt/8ubbtmue/F3c+BusOKkAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQOa1bVtm215QZfJ7bdvROvHU/asTNz6vEzc+i8pT39UTTioAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkPl69wX8iaduJVW27WhVz6v6XtVnnajus3f+723b49r2rlacVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEg89q2GwPAvZxUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMqICQEZUAMiICgAZUQEgIyoAZEQFgIyoAJARFQAyogJARlQAyIgKABlRASAjKgBkRAWAjKgAkBEVADKiAkBGVADIiAoAGVEBICMqAGREBYCMqACQERUAMv8BYvbiGAYSLswAAAAASUVORK5CYII=";
-        qrImg.style.display="block";
-      }
-      if(qrFallback) qrFallback.style.display="none";
-    }
+    let isAdmin = localStorage.getItem("gmgn_admin_ok") === "true";
 
     function copyWallet(){copyText(PAYMENT_INFO.walletAddress)}
     async function copyText(text){
@@ -306,7 +343,15 @@
       box.innerText=obj?`[${now}] ${text}\n\n`+JSON.stringify(obj,null,2):`[${now}] ${text}`;
     }
 
-    function selectPlan(plan){setTimeout(()=>{const el=document.getElementById("orderPlan");if(el)el.value=plan},100)}
+    function selectPlan(plan, amount){
+      setTimeout(()=>{
+        const p=document.getElementById("orderPlan");
+        const a=document.getElementById("orderAmount");
+        if(p)p.value=plan;
+        if(a)a.value=amount||"";
+      },100)
+    }
+
     function getOrders(){try{return JSON.parse(localStorage.getItem("gmgn_orders")||"[]")}catch(e){return []}}
     function setOrders(orders){localStorage.setItem("gmgn_orders",JSON.stringify(orders))}
 
@@ -314,23 +359,30 @@
       const name=document.getElementById("orderName").value.trim();
       const telegram=document.getElementById("orderTelegram").value.trim();
       const plan=document.getElementById("orderPlan").value;
+      const amount=document.getElementById("orderAmount").value.trim();
+      const txid=document.getElementById("orderTxid").value.trim();
       const note=document.getElementById("orderNote").value.trim();
       if(!name){alert("请填写昵称");return}
       if(!telegram){alert("请填写 Telegram 用户名");return}
+      if(!amount){alert("请填写付款金额");return}
       const orders=getOrders();
       orders.unshift({
         id:"GMGN-"+Date.now(),
-        name,telegram,plan,note,
+        name,telegram,plan,amount,txid,note,
         paymentNetwork:PAYMENT_INFO.network,
         walletAddress:PAYMENT_INFO.walletAddress,
         status:"待确认",
+        memberCode:"",
         time:new Date().toLocaleString()
       });
       setOrders(orders);
       document.getElementById("orderName").value="";
       document.getElementById("orderTelegram").value="";
+      document.getElementById("orderAmount").value="";
+      document.getElementById("orderTxid").value="";
       document.getElementById("orderNote").value="";
       renderOrders();
+      renderAdminOrders();
       alert("订单已登记。请联系 Telegram 发送付款截图或交易哈希。");
     }
 
@@ -340,26 +392,148 @@
       if(!orders.length){box.innerHTML='<div class="muted" style="margin-top:10px;">暂无本地订单记录。</div>';return}
       box.innerHTML=orders.map((o,index)=>`
         <div class="order-item">
-          <div><span class="tag tag-ok">${o.status}</span> <span class="tag">${o.plan}</span></div>
+          <div><span class="tag ${o.status==='已开通'?'tag-ok':o.status==='已拒绝'?'tag-bad':'tag-b'}">${o.status}</span> <span class="tag">${o.plan}</span></div>
           <b>订单号：</b>${o.id}<br/>
           <b>昵称：</b>${o.name}<br/>
           <b>Telegram：</b>${o.telegram}<br/>
+          <b>金额：</b>${o.amount||"-"} USDT<br/>
+          <b>TXID：</b>${o.txid||"未填写"}<br/>
           <b>付款网络：</b>${o.paymentNetwork||PAYMENT_INFO.network}<br/>
-          <b>收款地址：</b>${o.walletAddress||PAYMENT_INFO.walletAddress}<br/>
           <b>时间：</b>${o.time}<br/>
+          <b>会员码：</b>${o.memberCode?'<span class="ok">'+o.memberCode+'</span>':'确认后发放'}<br/>
           <b>备注：</b>${o.note||"无"}<br/>
           <div class="sell-actions">
+            <button class="secondary" onclick="copyText('${o.id}')">复制订单号</button>
             <button class="secondary" onclick="copyText('${o.telegram}')">复制 Telegram</button>
-            <button class="secondary" onclick="markOrderDone(${index})">标记已开通</button>
-            <button class="danger-btn" onclick="deleteOrder(${index})">删除</button>
           </div>
         </div>`).join("");
     }
 
-    function markOrderDone(index){const orders=getOrders();if(!orders[index])return;orders[index].status="已开通";setOrders(orders);renderOrders()}
-    function deleteOrder(index){if(!confirm("确定删除这条订单吗？"))return;const orders=getOrders();orders.splice(index,1);setOrders(orders);renderOrders()}
-    function clearOrders(){if(!confirm("确定清空本地订单记录吗？"))return;localStorage.removeItem("gmgn_orders");renderOrders()}
-    function exportOrders(){copyText(JSON.stringify(getOrders(),null,2));alert("订单记录已复制，可粘贴到备忘录或表格。")}
+    function clearOrders(){
+      if(!confirm("确定清空本地订单记录吗？"))return;
+      localStorage.removeItem("gmgn_orders");
+      renderOrders();
+      renderAdminOrders();
+    }
+
+    function exportOrders(){
+      const text=JSON.stringify(getOrders(),null,2);
+      copyText(text);
+      alert("订单记录已复制，可粘贴到备忘录或表格。");
+    }
+
+    function adminLogin(){
+      const pass=document.getElementById("adminPass").value.trim();
+      if(pass===ADMIN_PASSWORD){
+        isAdmin=true;
+        localStorage.setItem("gmgn_admin_ok","true");
+        refreshAdminUI();
+        alert("管理员登录成功");
+      }else{
+        alert("管理员密码错误");
+      }
+    }
+
+    function adminLogout(){
+      isAdmin=false;
+      localStorage.removeItem("gmgn_admin_ok");
+      refreshAdminUI();
+    }
+
+    function refreshAdminUI(){
+      const login=document.getElementById("adminLoginBox");
+      const box=document.getElementById("adminBox");
+      if(isAdmin){
+        login.classList.add("hidden");
+        box.classList.remove("hidden");
+        renderMemberCodes();
+        renderAdminOrders();
+      }else{
+        login.classList.remove("hidden");
+        box.classList.add("hidden");
+      }
+    }
+
+    function renderMemberCodes(){
+      const box=document.getElementById("memberCodeList");
+      box.innerHTML=VALID_MEMBER_CODES.map(code=>`
+        <div class="code-item">
+          <b class="ok">${code}</b>
+          <div class="sell-actions">
+            <button class="secondary" onclick="copyText('${code}')">复制会员码</button>
+          </div>
+        </div>`).join("");
+    }
+
+    function copyAllMemberCodes(){
+      copyText(VALID_MEMBER_CODES.join("\n"));
+    }
+
+    function renderAdminOrders(){
+      if(!isAdmin)return;
+      const orders=getOrders();
+      const total=orders.length;
+      const pending=orders.filter(o=>o.status==="待确认").length;
+      const opened=orders.filter(o=>o.status==="已开通").length;
+      const rejected=orders.filter(o=>o.status==="已拒绝").length;
+      document.getElementById("adminTotal").innerText=total;
+      document.getElementById("adminPending").innerText=pending;
+      document.getElementById("adminOpened").innerText=opened;
+      document.getElementById("adminRejected").innerText=rejected;
+
+      const box=document.getElementById("adminOrderList");
+      if(!orders.length){box.innerHTML='<div class="muted">暂无订单。</div>';return}
+      box.innerHTML=orders.map((o,index)=>`
+        <div class="admin-item">
+          <div><span class="tag ${o.status==='已开通'?'tag-ok':o.status==='已拒绝'?'tag-bad':'tag-b'}">${o.status}</span> <span class="tag">${o.plan}</span></div>
+          <b>订单号：</b>${o.id}<br/>
+          <b>客户：</b>${o.name} / ${o.telegram}<br/>
+          <b>金额：</b>${o.amount||"-"} USDT<br/>
+          <b>TXID：</b>${o.txid||"未填写"}<br/>
+          <b>时间：</b>${o.time}<br/>
+          <b>会员码：</b>${o.memberCode||"未发放"}<br/>
+          <b>备注：</b>${o.note||"无"}<br/>
+          <div class="sell-actions">
+            <button class="secondary" onclick="copyText('${o.telegram}')">复制客户TG</button>
+            <button class="secondary" onclick="assignCode(${index})">分配会员码</button>
+            <button class="secondary" onclick="markOrder(${index},'已开通')">标记已开通</button>
+            <button class="danger-btn" onclick="markOrder(${index},'已拒绝')">标记拒绝</button>
+            <button class="danger-btn" onclick="deleteOrder(${index})">删除订单</button>
+          </div>
+        </div>`).join("");
+    }
+
+    function assignCode(index){
+      const orders=getOrders();
+      if(!orders[index])return;
+      const used=orders.map(o=>o.memberCode).filter(Boolean);
+      const code=VALID_MEMBER_CODES.find(c=>!used.includes(c)) || VALID_MEMBER_CODES[0];
+      orders[index].memberCode=code;
+      orders[index].status="已开通";
+      setOrders(orders);
+      renderOrders();
+      renderAdminOrders();
+      copyText(code);
+      alert("已分配会员码并复制：" + code);
+    }
+
+    function markOrder(index,status){
+      const orders=getOrders();
+      if(!orders[index])return;
+      orders[index].status=status;
+      setOrders(orders);
+      renderOrders();
+      renderAdminOrders();
+    }
+
+    function deleteOrder(index){
+      if(!confirm("确定删除这条订单吗？"))return;
+      const orders=getOrders();
+      orders.splice(index,1);
+      setOrders(orders);
+      renderOrders();
+      renderAdminOrders();
+    }
 
     function refreshMemberUI(){
       const appArea=document.getElementById("appArea");
@@ -418,7 +592,7 @@
         const data=await res.json();
         document.getElementById("backendStatus").innerHTML=`
           后端版本：<span class="ok">${data.version||"-"}</span><br/>
-          前端版本：<span class="ok">V1.3.3</span><br/>
+          前端版本：<span class="ok">V1.3.4</span><br/>
           自动提醒：${data.autoAlert?'<span class="ok">已开启</span>':'<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds||"-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize||0} 个`;
@@ -615,11 +789,7 @@
         const result=data.result||{};
         status.innerText=`提醒扫描完成｜候选：${result.alertCandidates||0}｜选中：${result.selectedForSend||0}｜已推送：${result.sentCount||0}`;
         renderDiagnostics(result);
-        log(force?"强制测试推送结果":"精准提醒扫描结果",{
-          chain:data.chain,source:result.source,total:result.total,
-          alertCandidates:result.alertCandidates,selectedForSend:result.selectedForSend,
-          sentCount:result.sentCount,sent:result.sent,failedSend:result.failedSend,rules:result.rules
-        });
+        log(force?"强制测试推送结果":"精准提醒扫描结果",{chain:data.chain,source:result.source,total:result.total,alertCandidates:result.alertCandidates,selectedForSend:result.selectedForSend,sentCount:result.sentCount,sent:result.sent,failedSend:result.failedSend,rules:result.rules});
         loadConfig();
       }catch(err){
         status.innerText="提醒扫描请求失败。";
@@ -636,14 +806,12 @@
     }
 
     document.addEventListener("DOMContentLoaded",function(){
-      initQrCode();
       refreshMemberUI();
+      refreshAdminUI();
       loadConfig();
       renderOrders();
       if(isMember)scan();
     });
-    setTimeout(initQrCode,500);
-    setTimeout(initQrCode,1500);
   </script>
 </body>
 </html>
