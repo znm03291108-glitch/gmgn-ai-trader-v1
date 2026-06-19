@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.2.9 会员登录码版</title>
+  <title>GMGN AI Trader V1.3.0 支付订单版</title>
   <style>
     body {
       margin: 0;
@@ -100,20 +100,26 @@
       margin: 12px 0;
     }
 
-    select, button, input {
+    select, button, input, textarea {
       border: none;
       border-radius: 12px;
       padding: 12px 14px;
       font-size: 15px;
     }
 
-    input {
+    input, textarea {
       background: #0b1220;
       color: #fff;
       border: 1px solid #2b3a52;
       width: 100%;
       box-sizing: border-box;
       margin-bottom: 10px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.6;
     }
 
     select {
@@ -447,6 +453,56 @@
       display: none;
     }
 
+    .pay-box {
+      background: #0b1220;
+      border: 1px dashed #36506f;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .pay-address {
+      background: #070b12;
+      border: 1px solid #26344d;
+      border-radius: 12px;
+      padding: 10px;
+      word-break: break-all;
+      color: #d9e2f1;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+
+    .fake-qr {
+      width: 160px;
+      height: 160px;
+      border-radius: 14px;
+      background:
+        linear-gradient(90deg, #0b1220 10px, transparent 10px) 0 0 / 20px 20px,
+        linear-gradient(#0b1220 10px, transparent 10px) 0 0 / 20px 20px,
+        #f4f7fb;
+      border: 8px solid #fff;
+      display: grid;
+      place-items: center;
+      color: #0b1220;
+      font-weight: bold;
+      text-align: center;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+
+    .order-item {
+      background: #0b1220;
+      border: 1px solid #26344d;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+      color: #d9e2f1;
+      font-size: 13px;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
     .footer {
       margin-top: 20px;
       color: #8190a8;
@@ -459,12 +515,12 @@
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.2.9 会员登录码版</h1>
-      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台。当前版本只做数据观察，不连接钱包，不自动买入。</p>
+      <h1>GMGN AI Trader V1.3.0 支付订单版</h1>
+      <p>Meme 币风险雷达 + 信号评分 + Telegram 提醒 + X/Twitter 热度入口 + 会员码控制台 + 订单登记。当前版本只做数据观察，不连接钱包，不自动买入。</p>
 
       <div class="sell-actions">
         <a class="sell-btn primary" href="#pricing">查看价格</a>
-        <a class="sell-btn gold" href="https://t.me/zleisheng" target="_blank">联系购买</a>
+        <a class="sell-btn gold" href="#payment">支付方式</a>
         <a class="sell-btn" href="#member">会员登录</a>
       </div>
 
@@ -497,33 +553,27 @@
         <div class="price-card">
           <h3>体验版</h3>
           <div class="price">$9</div>
-          <div class="muted">
-            适合：想先试用工具、看看扫描、评分、X 搜索入口和 Telegram 提醒效果的人。
-          </div>
+          <div class="muted">适合：想先试用工具、看看扫描、评分、X 搜索入口和 Telegram 提醒效果的人。</div>
           <div class="sell-actions">
-            <a class="sell-btn primary" href="https://t.me/zleisheng" target="_blank">立即购买</a>
+            <a class="sell-btn primary" href="#payment" onclick="selectPlan('体验版 $9')">立即购买体验版</a>
           </div>
         </div>
 
         <div class="price-card">
           <h3>部署版</h3>
           <div class="price">$29</div>
-          <div class="muted">
-            适合：想拥有自己独立网页和 Telegram 机器人的人。提供 GitHub Pages、Railway、Telegram 配置流程。
-          </div>
+          <div class="muted">适合：想拥有自己独立网页和 Telegram 机器人的人。提供 GitHub Pages、Railway、Telegram 配置流程。</div>
           <div class="sell-actions">
-            <a class="sell-btn primary" href="https://t.me/zleisheng" target="_blank">联系部署</a>
+            <a class="sell-btn primary" href="#payment" onclick="selectPlan('部署版 $29')">购买部署版</a>
           </div>
         </div>
 
         <div class="price-card">
           <h3>定制版</h3>
           <div class="price">$99+</div>
-          <div class="muted">
-            适合：群主、KOL、项目方、想做自己品牌雷达系统的人。可定制链、提醒规则、黑名单、页面品牌。
-          </div>
+          <div class="muted">适合：群主、KOL、项目方、想做自己品牌雷达系统的人。可定制链、提醒规则、黑名单、页面品牌。</div>
           <div class="sell-actions">
-            <a class="sell-btn primary" href="https://t.me/zleisheng" target="_blank">联系定制</a>
+            <a class="sell-btn primary" href="#payment" onclick="selectPlan('定制版 $99+')">联系定制</a>
           </div>
         </div>
       </div>
@@ -533,6 +583,77 @@
       </div>
     </div>
 
+    <div class="panel" id="payment">
+      <h2>支付方式</h2>
+      <div class="grid">
+        <div class="pay-box">
+          <h3>USDT 付款</h3>
+          <div class="muted">
+            付款前建议先联系 Telegram 确认套餐和付款网络。付款后填写下方订单登记表。
+          </div>
+
+          <div class="pay-address" id="usdtAddress">
+            请联系 Telegram 获取最新 USDT 收款地址。<br/>
+            Telegram：@zleisheng
+          </div>
+
+          <div class="sell-actions">
+            <button class="secondary" onclick="copyText('https://t.me/zleisheng')">复制 Telegram 联系方式</button>
+            <a class="sell-btn gold" href="https://t.me/zleisheng" target="_blank">打开 Telegram</a>
+          </div>
+        </div>
+
+        <div class="pay-box">
+          <h3>二维码支付</h3>
+          <div class="fake-qr">
+            支付二维码<br/>
+            可后续替换
+          </div>
+          <div class="muted">
+            这里先放占位二维码。你后面可以把它替换成微信、支付宝或 USDT 收款二维码图片。
+          </div>
+        </div>
+
+        <div class="pay-box">
+          <h3>付款后流程</h3>
+          <div class="muted">
+            1. 选择套餐<br/>
+            2. 联系 Telegram 确认付款方式<br/>
+            3. 付款后登记订单<br/>
+            4. 人工确认后发送会员码<br/>
+            5. 输入会员码进入控制台
+          </div>
+          <div class="success">
+            通常付款确认后 5-10 分钟内发放会员码。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="order">
+      <h2>订单登记</h2>
+      <div class="muted">付款后请填写订单信息，方便核对并发送会员码。本地演示版订单只保存在当前浏览器。</div>
+
+      <div class="login-box">
+        <input id="orderName" placeholder="你的昵称，例如 Alex" />
+        <input id="orderTelegram" placeholder="Telegram 用户名，例如 @yourname" />
+        <select id="orderPlan">
+          <option value="体验版 $9">体验版 $9</option>
+          <option value="部署版 $29">部署版 $29</option>
+          <option value="定制版 $99+">定制版 $99+</option>
+        </select>
+        <textarea id="orderNote" placeholder="付款说明，例如：已付 USDT，交易哈希 / 时间 / 备注"></textarea>
+
+        <div class="sell-actions">
+          <button onclick="saveOrder()">提交订单登记</button>
+          <button class="secondary" onclick="exportOrders()">导出订单记录</button>
+          <button class="danger-btn" onclick="clearOrders()">清空本地订单</button>
+        </div>
+      </div>
+
+      <div id="orderList"></div>
+    </div>
+
     <div class="panel" id="member">
       <h2>会员登录</h2>
       <div id="memberStatus" class="status-line">未登录。请输入会员码后进入控制台。</div>
@@ -540,7 +661,7 @@
       <div id="loginBox" class="login-box">
         <input id="memberCode" placeholder="请输入会员码，例如 VIP2026" />
         <button onclick="loginMember()">进入会员控制台</button>
-        <a class="sell-btn gold" href="https://t.me/zleisheng" target="_blank">没有会员码？联系购买</a>
+        <a class="sell-btn gold" href="#payment">没有会员码？先购买</a>
       </div>
 
       <div id="memberBox" class="success hidden">
@@ -625,7 +746,7 @@
     </div>
 
     <div class="footer">
-      当前版本：V1.2.9 会员登录码 + 购买按钮版。后续可升级：后端真实会员验证、支付二维码、订单记录、真实 X 热度评分、网页添加黑名单。
+      当前版本：V1.3.0 支付二维码 + 订单记录版。后续可升级：后端真实会员验证、支付二维码图片、Supabase 云端订单、会员码生成器、Telegram 自动发会员码。
     </div>
   </div>
 
@@ -711,6 +832,128 @@
       }
     }
 
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("已复制");
+      } catch (e) {
+        alert(text);
+      }
+    }
+
+    function selectPlan(plan) {
+      setTimeout(() => {
+        const el = document.getElementById("orderPlan");
+        if (el) el.value = plan;
+      }, 100);
+    }
+
+    function getOrders() {
+      try {
+        return JSON.parse(localStorage.getItem("gmgn_orders") || "[]");
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setOrders(orders) {
+      localStorage.setItem("gmgn_orders", JSON.stringify(orders));
+    }
+
+    function saveOrder() {
+      const name = document.getElementById("orderName").value.trim();
+      const telegram = document.getElementById("orderTelegram").value.trim();
+      const plan = document.getElementById("orderPlan").value;
+      const note = document.getElementById("orderNote").value.trim();
+
+      if (!name) {
+        alert("请填写昵称");
+        return;
+      }
+
+      if (!telegram) {
+        alert("请填写 Telegram 用户名");
+        return;
+      }
+
+      const orders = getOrders();
+
+      const order = {
+        id: "GMGN-" + Date.now(),
+        name,
+        telegram,
+        plan,
+        note,
+        status: "待确认",
+        time: new Date().toLocaleString()
+      };
+
+      orders.unshift(order);
+      setOrders(orders);
+
+      document.getElementById("orderName").value = "";
+      document.getElementById("orderTelegram").value = "";
+      document.getElementById("orderNote").value = "";
+
+      renderOrders();
+      alert("订单已登记。请联系 Telegram 发送付款截图或交易哈希。");
+    }
+
+    function renderOrders() {
+      const box = document.getElementById("orderList");
+      const orders = getOrders();
+
+      if (!orders.length) {
+        box.innerHTML = `<div class="muted" style="margin-top:10px;">暂无本地订单记录。</div>`;
+        return;
+      }
+
+      box.innerHTML = orders.map((o, index) => `
+        <div class="order-item">
+          <div><span class="tag tag-ok">${o.status}</span> <span class="tag">${o.plan}</span></div>
+          <b>订单号：</b>${o.id}<br/>
+          <b>昵称：</b>${o.name}<br/>
+          <b>Telegram：</b>${o.telegram}<br/>
+          <b>时间：</b>${o.time}<br/>
+          <b>备注：</b>${o.note || "无"}<br/>
+          <div class="sell-actions">
+            <button class="secondary" onclick="copyText('${o.telegram}')">复制 Telegram</button>
+            <button class="secondary" onclick="markOrderDone(${index})">标记已开通</button>
+            <button class="danger-btn" onclick="deleteOrder(${index})">删除</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function markOrderDone(index) {
+      const orders = getOrders();
+      if (!orders[index]) return;
+      orders[index].status = "已开通";
+      setOrders(orders);
+      renderOrders();
+    }
+
+    function deleteOrder(index) {
+      if (!confirm("确定删除这条订单吗？")) return;
+      const orders = getOrders();
+      orders.splice(index, 1);
+      setOrders(orders);
+      renderOrders();
+    }
+
+    function clearOrders() {
+      if (!confirm("确定清空本地订单记录吗？")) return;
+      localStorage.removeItem("gmgn_orders");
+      renderOrders();
+    }
+
+    function exportOrders() {
+      const orders = getOrders();
+      const text = JSON.stringify(orders, null, 2);
+      copyText(text);
+      alert("订单记录已复制，可粘贴到备忘录或表格。");
+    }
+
     function refreshMemberUI() {
       const appArea = document.getElementById("appArea");
       const memberStatus = document.getElementById("memberStatus");
@@ -724,7 +967,7 @@
         memberBox.classList.remove("hidden");
       } else {
         appArea.classList.add("locked");
-        memberStatus.innerHTML = `<span class="bad">未登录。</span> 请输入会员码后进入控制台。`;
+        memberStatus.innerHTML = `<span class="bad">未登录。</span> 请输入会员码后进入控制台。付款后联系客服获取会员码。`;
         loginBox.classList.remove("hidden");
         memberBox.classList.add("hidden");
       }
@@ -777,7 +1020,7 @@
 
         document.getElementById("backendStatus").innerHTML = `
           后端版本：<span class="ok">${data.version || "-"}</span><br/>
-          前端版本：<span class="ok">V1.2.9</span><br/>
+          前端版本：<span class="ok">V1.3.0</span><br/>
           自动提醒：${data.autoAlert ? '<span class="ok">已开启</span>' : '<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds || "-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize || 0} 个
@@ -835,15 +1078,6 @@
       return allTokens;
     }
 
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("已复制");
-      } catch (e) {
-        alert(text);
-      }
-    }
-
     function render() {
       const cards = document.getElementById("cards");
       const list = filteredTokens();
@@ -874,125 +1108,4 @@
             <div class="top">
               <div>
                 <div class="symbol">${symbol}</div>
-                <div class="name">${token.name || ""}</div>
-              </div>
-              <div class="level">${risk.level || "未知"}</div>
-            </div>
-
-            <div style="margin-top:8px;">
-              ${gradeTag}
-              ${whiteTag}
-              ${blackTag}
-            </div>
-
-            <div class="score-row">
-              <div class="score-box">
-                <div class="score-num ${riskClass}">${riskScore}</div>
-                <div class="score-label">风险评分 / 100</div>
-              </div>
-
-              <div class="score-box">
-                <div class="score-num ${sigClass}">${signalScore}</div>
-                <div class="score-label">信号评分 / 100</div>
-              </div>
-            </div>
-
-            <div class="signal-box">
-              <div class="signal-title">信号判断</div>
-              <div class="meta">
-                推荐等级：<span class="${sigClass}">${signal.grade || "C"}级 - ${signal.label || "过滤"}</span><br/>
-                信号建议：${signal.advice || "暂无"}<br/>
-                信号原因：${signal.reasons && signal.reasons.length ? signal.reasons.join("、") : "暂无"}<br/>
-                X热度：<span class="mid">需人工打开 X 确认</span>
-              </div>
-            </div>
-
-            <div class="meta" style="margin-top:10px;">
-              链：${token.chain || "-"}<br/>
-              合约：${token.shortAddress || token.address || "-"}<br/>
-              价格：${price(token.price)}<br/>
-              流动性：${money(token.liquidity)}<br/>
-              24H交易量：${money(token.volume24h)}<br/>
-              前10持仓：${Number(token.top10HolderRate || 0).toFixed(2)}%<br/>
-              1小时涨幅：${Number(token.priceChange1h || 0).toFixed(2)}%<br/>
-              买税/卖税：${Number(token.buyTax || 0).toFixed(2)}% / ${Number(token.sellTax || 0).toFixed(2)}%<br/>
-              新盘时间：${Number(token.ageMinutes || 0)} 分钟
-            </div>
-
-            <div class="reason">
-              风险原因：${risk.reasons && risk.reasons.length ? risk.reasons.join("、") : "暂未发现明显高危项"}
-            </div>
-
-            <div class="advice">
-              AI建议：${signal.advice || risk.advice || "仅供观察"}
-            </div>
-
-            <div class="actions">
-              ${address ? `<button class="mini-btn" onclick="copyText('${address}')">复制合约</button>` : ""}
-              ${token.gmgnUrl ? `<a class="mini-btn" href="${token.gmgnUrl}" target="_blank">打开 GMGN</a>` : ""}
-              ${token.dexUrl ? `<a class="mini-btn" href="${token.dexUrl}" target="_blank">打开 Dex</a>` : ""}
-              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'live')}" target="_blank">X 最新</a>
-              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'cash')}" target="_blank">搜索 $${symbol}</a>
-              <a class="mini-btn" href="${xSearchUrl(symbol, address, 'hot')}" target="_blank">X 热门</a>
-              ${address ? `<a class="mini-btn" href="${xSearchUrl(symbol, address, 'address')}" target="_blank">X 搜合约</a>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderDiagnostics(result) {
-      const summary = document.getElementById("diagnosticSummary");
-      const listBox = document.getElementById("diagnosticList");
-
-      const diagnostics = result.diagnostics || [];
-      const passed = diagnostics.filter(x => x.canSend).length;
-      const failed = diagnostics.length - passed;
-      const blacklisted = diagnostics.filter(x => x.isBlacklisted).length;
-      const whitelisted = diagnostics.filter(x => x.isWhitelisted).length;
-      const sCount = diagnostics.filter(x => x.signalGrade === "S").length;
-      const aCount = diagnostics.filter(x => x.signalGrade === "A").length;
-      const bCount = diagnostics.filter(x => x.signalGrade === "B").length;
-      const cCount = diagnostics.filter(x => x.signalGrade === "C").length;
-
-      summary.innerHTML = `
-        <div class="summary-grid">
-          <div class="summary-item"><div class="summary-num green">${result.total || 0}</div><div class="status-line">扫描总数</div></div>
-          <div class="summary-item"><div class="summary-num green">${result.alertCandidates || 0}</div><div class="status-line">符合候选</div></div>
-          <div class="summary-item"><div class="summary-num yellow">${result.selectedForSend || 0}</div><div class="status-line">选中推送</div></div>
-          <div class="summary-item"><div class="summary-num green">${result.sentCount || 0}</div><div class="status-line">已推送</div></div>
-          <div class="summary-item"><div class="summary-num green">${passed}</div><div class="status-line">通过规则</div></div>
-          <div class="summary-item"><div class="summary-num red">${failed}</div><div class="status-line">未通过规则</div></div>
-          <div class="summary-item"><div class="summary-num green">${sCount}</div><div class="status-line">S级</div></div>
-          <div class="summary-item"><div class="summary-num blue">${aCount}</div><div class="status-line">A级</div></div>
-          <div class="summary-item"><div class="summary-num yellow">${bCount}</div><div class="status-line">B级</div></div>
-          <div class="summary-item"><div class="summary-num red">${cCount}</div><div class="status-line">C级过滤</div></div>
-          <div class="summary-item"><div class="summary-num red">${blacklisted}</div><div class="status-line">黑名单命中</div></div>
-          <div class="summary-item"><div class="summary-num green">${whitelisted}</div><div class="status-line">白名单命中</div></div>
-        </div>
-      `;
-
-      if (!diagnostics.length) {
-        listBox.innerHTML = `<div class="status">暂无诊断数据。</div>`;
-        return;
-      }
-
-      listBox.innerHTML = diagnostics.map(d => {
-        const failedReasons = d.failed || [];
-        const ok = d.canSend;
-        const symbol = d.symbol || "UNKNOWN";
-        const address = d.address || "";
-
-        return `
-          <div class="diag-card ${ok ? "diag-ok" : "diag-bad"}">
-            <div class="diag-title">${symbol}</div>
-
-            <div>
-              ${ok ? '<span class="tag tag-ok">符合推送</span>' : '<span class="tag tag-bad">未推送</span>'}
-              <span class="tag ${gradeClass(d.signalGrade)}">${d.signalGrade || "C"}级 - ${d.signalLabel || "过滤"}</span>
-              ${d.isWhitelisted ? '<span class="tag tag-white">⭐ 白名单</span>' : ''}
-              ${d.isBlacklisted ? '<span class="tag tag-black">⛔ 黑名单</span>' : ''}
-              <span class="tag">风险 ${d.score}</span>
-              <span class="tag">信号 ${d.signalScore}</span>
-              <span class="tag">流动性 ${money(d.liquidity)}</span>
-              <span class="t
+                <di
