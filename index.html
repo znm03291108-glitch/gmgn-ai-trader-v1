@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMGN AI Trader V1.3.6 专业筛选解释版</title>
+  <title>GMGN AI Trader V1.3.6.1 客户展示优化版</title>
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#070b12;color:#f4f7fb;font-family:Arial,"Microsoft YaHei",sans-serif}
@@ -87,44 +87,29 @@
     .case-up{font-size:24px;font-weight:bold;color:#81f0a4;margin:8px 0}
     .pro-note{background:rgba(143,211,255,.10);border:1px solid rgba(143,211,255,.35);border-radius:14px;padding:12px;color:#bfe8ff;line-height:1.6;font-size:14px;margin-top:12px}
 
+
+    .hidden-admin{display:none}
+    .admin-opened{display:block!important}
+    .customer-note{background:rgba(129,240,164,.10);border:1px solid rgba(129,240,164,.35);border-radius:14px;padding:12px;color:#c9ffd8;line-height:1.6;font-size:14px;margin-top:12px}
+
   </style>
 </head>
 <body>
   <div class="page">
     <div class="hero">
-      <h1>GMGN AI Trader V1.3.6 专业筛选解释版</h1>
+      <h1>GMGN AI Trader V1.3.6.1 客户展示优化版</h1>
       <p>从大量 Meme 新币里自动做初筛：先过滤明显高风险、低流动性、异常波动和老盘，再给出候选榜单、入选原因、过滤原因与 Telegram 提醒。</p>
       <div class="sell-actions">
         <a class="sell-btn primary" href="#pricing">查看价格</a>
         <a class="sell-btn gold" href="#payment">支付方式</a>
         <a class="sell-btn" href="#order">订单登记</a>
-        <a class="sell-btn" href="#admin">管理员</a>
+        
       </div>
       <div class="warning">风险提醒：本工具只做风险辅助判断，不构成投资建议。Meme 币波动极大，可能归零。不要重仓跟买。</div>
-    </div>
-
-    <div class="panel" id="supabaseSetup">
-      <h2>Supabase 云端状态</h2>
-      <div id="cloudStatus" class="status-line">正在检查 Supabase 配置...</div>
-      <div class="setup-box">
-        <div class="muted">
-          使用前需要把代码顶部的 <b>SUPABASE_URL</b> 和 <b>SUPABASE_ANON_KEY</b> 换成你的 Supabase 项目参数。<br/>
-          如果未配置，订单会自动保存到本地浏览器，方便先测试页面。
-        </div>
+      <div class="customer-note">
+        客户流程：付款后填写订单登记，并联系 Telegram 发送截图或交易哈希。确认后会收到会员码，输入会员码即可使用控制台。
       </div>
-    </div>
 
-
-    <div class="panel">
-      <h2>它到底帮你筛什么？</h2>
-      <div class="pro-note">
-        本工具不是“喊单工具”，也不承诺找到百倍币。它的价值是：把一堆新币先按规则过滤，减少你手动翻 GMGN、DexScreener、X/Twitter 的时间。
-      </div>
-      <div class="grid" style="margin-top:12px;">
-        <div class="step-card"><h3>过滤明显垃圾币</h3><div class="muted">低流动性、低交易量、异常涨跌、黑名单关键词、时间过老的币会被优先过滤。</div></div>
-        <div class="step-card"><h3>留下观察候选</h3><div class="muted">符合基础条件的币会进入观察区，再通过信号评分排序。</div></div>
-        <div class="step-card"><h3>解释为什么</h3><div class="muted">每个币都会显示入选原因或过滤原因，不只是给一个分数。</div></div>
-      </div>
     </div>
 
     <div class="panel">
@@ -216,7 +201,7 @@
       <div id="orderList"></div>
     </div>
 
-    <div class="panel" id="admin">
+    <div class="panel hidden-admin" id="admin">
       <h2>管理员订单管理</h2>
       <div id="adminLoginBox" class="login-box">
         <div class="muted">管理员输入密码后，可以查看云端订单、标记状态、复制会员码。</div>
@@ -353,7 +338,13 @@
       <div id="cards" class="cards"></div>
     </div>
 
-    <div class="footer">当前版本：V1.3.6 专业筛选解释版。说明：重点增强筛选漏斗、候选榜单、入选原因、过滤原因和历史观察案例。</div>
+
+    <div class="footer">
+      当前版本：V1.3.6.1 客户展示优化版。管理员入口：连续点击下方版本号 5 次，或在网址后面加 <b>?admin=1</b> 打开管理员区。
+      <br/>
+      <span id="versionTap" onclick="secretAdminTap()" style="cursor:pointer;">V1.3.6.1</span>
+    </div>
+
   </div>
 
   <script>
@@ -739,7 +730,8 @@
         isMember=true;
         localStorage.setItem("gmgn_member_ok","true");
         localStorage.setItem("gmgn_member_code",code);
-        refreshMemberUI();
+        checkAdminUrl();
+      refreshMemberUI();
         alert("会员登录成功");
         scan();
         location.hash="#console";
@@ -771,7 +763,7 @@
         const data=await res.json();
         document.getElementById("backendStatus").innerHTML=`
           后端版本：<span class="ok">${data.version||"-"}</span><br/>
-          前端版本：<span class="ok">V1.3.6</span><br/>
+          前端版本：<span class="ok">V1.3.6.1</span><br/>
           自动提醒：${data.autoAlert?'<span class="ok">已开启</span>':'<span class="bad">已关闭</span>'}<br/>
           扫描间隔：${data.scanIntervalSeconds||"-"} 秒<br/>
           已提醒缓存：${data.sentCacheSize||0} 个`;
@@ -1139,8 +1131,34 @@ ${token.address || "-"}
       alert("已开启自动刷新：每30秒刷新一次");
     }
 
+
+    let adminTapCount = 0;
+    function openAdminPanel(){
+      const admin = document.getElementById("admin");
+      if(admin){
+        admin.classList.remove("hidden-admin");
+        admin.classList.add("admin-opened");
+        location.hash = "#admin";
+      }
+    }
+
+    function secretAdminTap(){
+      adminTapCount++;
+      if(adminTapCount >= 5){
+        openAdminPanel();
+        adminTapCount = 0;
+      }
+    }
+
+    function checkAdminUrl(){
+      const qs = new URLSearchParams(location.search);
+      if(qs.get("admin") === "1" || location.hash === "#admin"){
+        openAdminPanel();
+      }
+    }
+
+
     document.addEventListener("DOMContentLoaded",async function(){
-      updateCloudStatus();
       refreshMemberUI();
       refreshAdminUI();
       loadConfig();
